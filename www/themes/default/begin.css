@@ -1,0 +1,39 @@
+.reconnection-panel{
+    display: none;
+}
+.replace-connect-panel{
+    display: none;
+}
+.reconnection-panel .background, .replace-connect-panel .background{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000;
+    opacity: 0.7;
+    z-index: 999;
+}
+
+.reconnection-panel .connect-info, .replace-connect-panel .connect-info{
+    position: absolute;
+    width: 500px;
+    box-sizing: border-box;
+    left: 50%;
+    margin-top: 200px;
+    margin-left: -250px;
+    background-color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    z-index: 1000;
+}
+.bold{
+    font-weight: bold;
+}
+.reconnection-panel .connect-info .icon{
+    text-align: center;
+}
+.reconnection-panel .connect-info .icon img{
+    width: 190px;
+}

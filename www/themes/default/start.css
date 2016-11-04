@@ -1,0 +1,263 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	font-family: Arial, Helvetica, sans-serif;
+}
+table {
+  border: 0 none;
+  border-collapse: collapse;
+}
+td{
+	text-align:left;
+	vertical-align:top;
+	padding: 0;
+}
+#head{
+	position:absolute;
+	top:0;
+	left:0;
+	right: 0;	
+	background: #164870 url(body.jpg) no-repeat top center;
+	height: 85px;
+}
+#logo h1{
+	margin: 5px 0 0 0;
+	height:80px;
+}
+#logo h1 a{
+	text-indent: -9999px;
+	display: block;
+	background: url(logo.png);
+	width: 397px;
+	height: 80px;
+	position:absolute;
+	left:50%;
+	margin-left:-479px;
+	top:5px;
+}
+#usefullinks{
+    position: absolute;
+    left: 50%;
+    width: 250px;
+    top: 3px;
+}
+#usefullinks li a{
+	color: white;
+	font-size:14px;
+}
+
+#auth{
+	position:absolute;
+	left:50%;
+	margin-left:229px;
+	top:0px;
+	width: 230px;
+	height: 67px;
+	padding: 6px;
+	background: #FFF url(sidebar.png) repeat-x;
+	border-radius: 0 0 5px 5px;
+	-moz-border-radius: 0 0 5px 5px;
+	-webkit-border-radius: 0 0 5px 5px;
+	-khtml-border-radius: 0 0 5px 5px;
+	color: #333;
+	font-size: 13px;
+}
+#auth p{
+	margin: 0 0 8px 0;	
+}
+#auth tr td{
+	padding-bottom: 5px;
+}
+#cont {
+	position: absolute;
+	top: 85px;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	color: #333;
+	overflow: hidden;
+}
+a {
+	text-decoration: none;
+	color: #216DA9;
+	outline: none !important;
+	cursor: pointer;
+}
+a:hover{
+	text-decoration: underline;
+}
+ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+#chat-pane{
+	background: white;
+}
+#chat-toolbar {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	font-size: 11px;
+	color: #666;
+	width: 220px;
+	height: 24px;
+	padding-top: 7px;
+	border-top: 1px solid #aaa;
+	background-color: white;
+	display: block;
+}
+#chat-toolbar li {
+	width: 18px;
+	height: 18px;
+	margin-left: 7px;
+	float: left;
+	display: inline-block;
+	cursor: pointer;
+	background-position: center center;
+	background-repeat: no-repeat;
+	margin-top: 2px;
+}
+#statusBtn{
+	background: url('../../img/status.png') no-repeat center center;
+}
+#stateBtn{
+    background: url('../../img/online.png') no-repeat center center;
+}
+#colorsBtn{
+	background: url('../../img/colors.png') no-repeat center center;
+}
+#smileBtn{
+	background: url('../../img/smile.png') no-repeat center center;
+}
+#designBtn{
+	background: url('../../img/design.png') no-repeat center center;
+}
+#moderBtn{
+	background: url('../../img/modermenu.png') no-repeat center center;
+	display:none;
+}
+#soundBtn, #notifBtn{
+	background: no-repeat center center;
+}
+.roster-pane {
+	position: absolute;
+	overflow-y: scroll;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 220px;
+	margin: 30px 0 32px 0;
+	/*background: url(dino.png) no-repeat 90% 100%, url(ngfon.png) repeat-x right bottom;*/
+	border-top: 1px solid #C5C5C5;
+}
+.roster-pane .user {
+	font-size: 12px;
+	margin: 0 4px 2px 4px;
+	display: block;
+	color: #666;
+	clear: both;
+	border-bottom: 2px solid #059BD5;	
+}
+.roster-pane .label {
+	float: left;
+	width: 110px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+.message-pane-wrapper {
+	clear: both;
+	overflow: auto;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: auto;
+	width: auto;
+	margin: 30px 220px 32px 0;
+	/*background: url(elka.gif) no-repeat 98% 99%, url(ngfon.png) repeat-x left bottom;
+	background: url(ngfon.png) repeat-x left bottom;*/
+	border-top: 1px solid #C5C5C5;
+}
+.message-pane {
+	margin: 0;
+	padding: 5px 10px 2px 10px;
+}
+.message-form-wrapper {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: auto;
+	margin-right: 220px;
+	border-top: 1px solid #ccc;
+	background-color: white;
+	height: 31px;
+}
+.message-form {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin-right: 340px;
+	padding: 0;
+}
+.message-form .messageinput{
+	border: 0 none;
+	padding: 5px 10px;
+	font-size: 14px;
+	width: 100%;
+	display: block;
+	outline-width: 0;
+	background-color: white;
+    height: 20px;
+    font-family: inherit;
+    resize: none;
+}
+.message-form .send {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	margin: 3px 247px 3px 3px;
+	width: auto;
+	font-size: 12px;
+	line-height: 12px;
+	border: 0 none;
+	height: 23px;
+	padding: 0 13px;	
+}
+.uploadImage{
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	margin: 3px 223px 3px 3px;
+	width: 18px;
+	height:20px;
+	border: 0;
+	cursor:pointer;
+	background: url('../../img/more.png') no-repeat center center;
+}
+.message-pane dt {
+	float: left;
+	color: #888;
+	font-size: 12px;
+	text-align: right;
+	padding-top: 4px;
+}
+.message-pane dd {
+	padding: 2px 0 1px 130px;
+	margin: 0 0 2px 35px;
+	font-size: 16px;
+	white-space: -o-pre-wrap; /* Opera */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+.message-pane dd .label {
+	font-weight: bold;
+	white-space: nowrap;
+	display: block;
+	margin-left: -125px;
+	width: 120px;
+	float: left;
+	overflow: hidden;
+}

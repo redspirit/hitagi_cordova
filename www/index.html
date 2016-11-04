@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Аниме чат Hitagi</title>
+	<link rel="shortcut icon" href="favicon.ico">
+	<link rel="stylesheet" type="text/css" href="themes/default/begin.css" />
+	<link rel="stylesheet" class="my-styles" type="text/css" href="themes/default/start.css" />
+	<link rel="stylesheet" media="screen" type="text/css" href="js/colorpicker/css/colorpicker.css" />
+
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/howler.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="js/hitagi.js?0"></script>
+	<script type="text/javascript" src="js/tools.js"></script>
+	<script type="text/javascript" src="http://vk.me/js/api/openapi.js?1"></script>
+<script type="text/javascript">
+	var VKAPIID = 4147366;
+	var currentRoom = 'public';
+	//var currentRoom = 'lets_play';
+	var ch = hitagiCreate(true);
+</script>	
+<script type="text/javascript" src="js/chatcore_bundle.js"></script>
+
+</head>
+<body>
+<div id="head">
+	<div id="logo">
+		<h1><a target="_blank" href="http://aniavatars.com">Аниме чат</a></h1>
+  	</div>
+	<div id="usefullinks">
+		<ul>
+			<li><a target="_blank" href="http://aniavatars.com/admin/games/">Мини игры</a></li>
+			<li><a target="_blank" href="http://aniavatars.com/admin/chat/rating.php">Рейтинг юзеров</a></li>
+			<li><a target="_blank" href="http://vk.com/hitagi_chat">Наша группа <img src="img/vk.png" alt="" /></a></li>
+			<li><a target="_blank" href="https://github.com/redspirit/hitagi-client/wiki/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D1%87%D0%B0%D1%82%D0%B0"><b>Правила чата</b></a></li>
+		</ul>
+	</div>
+	<div id="auth">
+	<p id="hello">Незалогинен</p>
+	<table width="100%">
+	  <tr>
+		<td><a href="#" onclick="window.open('/admin/background.html','','Toolbar=0,Location=0,Directories=0,Status=0,Menubar=0,Scrollbars=0,Resizable=0,Width=800,Height=600');return false;">Сменить фон</a></td>
+		<td><a href="#" id="profile_btn">Профиль</a></td>
+	  </tr>
+	  <tr>
+		<td><a href="#" id="setava">Сменить аватарку</a></td>
+		<td><a href="#" id="logout_btn">Выйти</a></td>
+	  </tr>
+	</table>
+	</div>	
+</div>
+
+<div class="is-loading">
+    <div class="sk-folding-cube">
+        <div class="sk-cube1 sk-cube"></div>
+        <div class="sk-cube2 sk-cube"></div>
+        <div class="sk-cube4 sk-cube"></div>
+        <div class="sk-cube3 sk-cube"></div>
+    </div>
+</div>
+
+<div class="reconnection-panel">
+	<div class="background"></div>
+	<div class="connect-info">
+		<p>Связь с сервером потеряна. Мы пытаемся установить соединение. Пожалуйста подождите или повторите попытку позже</p>
+		<p class="bold">Попытка подключения: <span id="reconnecting-trying">0</span></p>
+		<div class="icon">
+			<img src="themes/default/reconnection_icon.png" alt="">
+		</div>
+	</div>
+</div>
+
+<div id="cont">
+	<div id="chat-pane">
+		<ul id="chat-tabs">
+			<li id="add-room-tab"><img src="img/plus.png" title="Открыть комнату" alt=""></li>
+		</ul>
+		<ul id="chat-toolbar">
+			<li id="smileBtn">
+
+			</li>
+			<li id="stateBtn" title="Изменить статус"></li>
+			<li id="statusBtn" title="Изменить статусный текст"></li>
+			<li id="colorsBtn" title="Цвет сообщения"></li>
+			<li id="soundBtn" title="Включить / выключить звук"></li>
+			<li id="notifBtn" title="Включить / выключить оповещения"></li>
+			<li id="designBtn" title="Настройка дизайна"></li>
+			<li id="moderBtn" style="display:none;"></li>
+		</ul>
+		<div id="chat-rooms" class="rooms"></div>
+	</div>
+</div>
+
+<div id="smileblock" style="z-index:20;">
+<table width="100%">
+  <tr>
+	<td class="smiletabs">
+		<div tab="1">1</div>
+		<div tab="2">2</div>
+		<div tab="3">3</div>
+		<div tab="4">4</div>
+		<div tab="5">5</div>
+		<div tab="6">6</div>
+		<div tab="7">7</div>
+		<div tab="8">8</div>
+		<div tab="9">9</div>
+	</td>
+	<td id="smCont"><div id="smWrap"></div></td>
+  </tr>
+</table>
+</div>
+
+<div id="designblock" style="z-index:20;">
+	<div class="db-capt">Выбор темы</div>
+	<div class="db-item" act="theme-default">Стандартная</div>
+	<div class="db-item" act="theme-dark">Темная (Лерав)</div>
+	<div class="db-capt">Размер картинок</div>
+	<div class="db-item" act="normal">Обычный</div>
+	<div class="db-item" act="small">Маленький</div>
+	<div class="db-item" act="hide">Скрыть</div>
+</div>
+
+<!--<div id="widget-radio"></div>
+ <div id="widget-help"></div>-->
+
+<!-- VK Widget 
+<div style="position:absolute;top:120px;right:240px;z-index:10;" id="vk_groups2">
+	<a href="lets_play" class="room-link"><img src="http://imgs.su/tmp/2014-01-08/1389126431-432.jpg" alt="" /></a>
+</div>-->
+<script type="text/javascript">
+//VK.Widgets.Group("vk_groups", {mode: 1, width: "220", height: "320", color1: 'FFFFFF', color2: '2B587A', color3: '5B7FA6'}, 49317466);
+</script>
+
+
+<div id="tmenu"></div>
+<div id="modmenu"></div>
+<div id="notificat" style="display:none"></div>
+<div id="alert" style="display:none"></div>
+<div id="overlay" style="display:none"></div>
+<input style="position:absolute; top:-10px; left:0; width:1px; height:1px; " type="file" id="uplFile" />
+<style type="text/css">
+    .message-pane-wrapper { background: url(themes/default/fon5.png) no-repeat bottom right; }
+    .roster-pane { background: url(themes/default/fonu1.png) no-repeat bottom right, url(themes/default/bg2.png); }
+</style>
+<script type="text/javascript">
+/* обрабатываем фон */
+window.addEventListener("storage", handle_storage, false);
+var sheet = document.styleSheets[document.styleSheets.length-1];
+//var sheetPics = document.styleSheets[document.styleSheets.length-1];
+function handle_storage(ev){
+
+	console.log("handle_storage", ev);
+
+    var st = '';
+	if(!localStorage.backimage1 && !localStorage.backimage2) {
+        if(ev) {
+            //alert('Фон очишен');
+
+            sheet.deleteRule(0);
+            sheet.deleteRule(0);
+
+            addStyle('.message-pane-wrapper', 'background: url(themes/default/fon5.png) no-repeat bottom right');
+            addStyle('.roster-pane', 'background: url(themes/default/fonu1.png) no-repeat bottom right, url(themes/default/bg2.png)');
+
+        }
+        return false;
+	}
+	
+	sheet.deleteRule(0);
+	sheet.deleteRule(0);
+
+	var met = localStorage.backmethod1 ? localStorage.backmethod1 : 'cover';
+	var color = localStorage.backcolor1 ? localStorage.backcolor1 : '#FFFFFF';
+	var data = color + ' url('+localStorage.backimage1+') ';
+	if(met == 'cover') st = 'no-repeat scroll 0% 100% / cover padding-box border-box';
+	if(met == 'center') st = 'no-repeat 50% 50%';
+	if(met == 'right-bottom') st = 'no-repeat 100% 100%';
+	if(met == 'repeat') st = '';
+	if(met == 'fill') st = 'no-repeat scroll 0% 0% / 100% 100%';
+	addStyle('.message-pane-wrapper', 'background: '+data+st);
+
+	met = localStorage.backmethod2 ? localStorage.backmethod2 : 'repeat';
+	color = localStorage.backcolor2 ? localStorage.backcolor2 : '#FFFFFF';
+	data = color + ' url('+localStorage.backimage2+') ';
+	if(met == 'cover') st = 'no-repeat scroll 0% 100% / cover padding-box border-box';
+	if(met == 'center') st = 'no-repeat 50% 50%';
+	if(met == 'right-bottom') st = 'no-repeat 100% 100%';
+	if(met == 'repeat') st = '';
+	if(met == 'fill') st = 'no-repeat scroll 0% 0% / 100% 100%';
+	addStyle('.roster-pane', 'background: '+data+st);
+}
+function addStyle(sel, rule){
+	if (sheet.addRule) { sheet.addRule(sel, rule); }
+	else { if (sheet.insertRule) { sheet.insertRule(sel + ' {' + rule + '}', sheet.cssRules.length); } }
+}
+handle_storage();
+
+if(localStorage.designImages){
+	designImagesUpdate(localStorage.designImages);
+} else {
+	localStorage.setItem('designImages', 'normal');
+	designImagesUpdate('normal');
+}
+if(localStorage.designTheme){
+	designThemeUpdate(localStorage.designTheme);
+} else {
+	localStorage.setItem('designTheme', 'theme-default');
+	designThemeUpdate('theme-default');
+}
+
+
+
+function designImagesUpdate(mode){
+	if(mode == 'normal') $('.inlinepic').css({'max-height':'600px', 'max-width':'600px', 'display':'inline'});
+	if(mode == 'small') $('.inlinepic').css({'max-height':'200px', 'max-width':'200px', 'display':'inline'});
+	if(mode == 'hide') $('.inlinepic').css({'display':'none'});	
+	$('.pic-block').css('height', 'auto');
+	localStorage.setItem('designImages', mode);
+}
+function designThemeUpdate(mode){
+	$('.my-styles').attr('href','themes/default/'+mode+'.css');
+	localStorage.setItem('designTheme', mode);
+}
+
+$('.head-trigger').click(headTriggerClick);
+function headTriggerClick(){
+	$(this).toggleClass('ht-close');
+	$('#cont').toggleClass('head-hide');
+	localStorage.headHide = localStorage.headHide == '1' ? '0' : '1'; 
+}
+if(localStorage.headHide=='1') headTriggerClick();
+
+</script>
+
+
+</body>
+</html>
