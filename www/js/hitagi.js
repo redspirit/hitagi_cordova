@@ -4,8 +4,8 @@
 	Homepage: http://redspirit.ru
 */
 
-function hitagiCreate(loging){
-	var socket = io();
+function hitagiCreate(socketUrl, loging){
+	var socket = io(socketUrl);
 	var log_enable = loging;
     var isHardClode = false;
 	var cookTime = 90; // login cookie = 90 days
