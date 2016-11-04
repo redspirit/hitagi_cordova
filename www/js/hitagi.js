@@ -1,11 +1,6 @@
-/*
-	Hitagi Server protocol framework v1.5 dev / 30.04.2016
-	Author: Tayanchin Alexey
-	Homepage: http://redspirit.ru
-*/
 
 function hitagiCreate(socketUrl, loging){
-	var socket = io(socketUrl);
+	var socket = io.connect(socketUrl);
 	var log_enable = loging;
     var isHardClode = false;
 	var cookTime = 90; // login cookie = 90 days

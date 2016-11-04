@@ -6,13 +6,13 @@ var user, rooms = {}, vkmid, curColor, isFocus = true, startRoomLoads = 0;
 var isNotif, curState, reciveMessCount = 30, hisoryLimit = 50;
 var mhist = {cur: '', old: ''}, correctLatMess = false;
 var titleDefault = 'Аниме чат Hitagi';
+var imagesUrl = 'http://chat.aniavatars.com';
 var blurTimers = {};
 
 /********** START APPLICATION ************/
 
 function start() {
     VK.init({apiId: VKAPIID});
-    initSounds();
     createElements();
     bindings();
     initToolButtons();
@@ -23,50 +23,34 @@ function createElements() {
     for (var i = 0; i < statesT.length; ++i) {
         $('#tmenu').append(tpl('statusitem', {s1: states[i], s2: statesT[i], n: i}));
     }
-
-    $('#widget-help').widget({
-        hideCloseBtn: true,
-        title: 'Правила чата',
-        x: $('#cont').width() - 370,
-        y: 119,
-        id: 'help',
-        content: tpl('rules')
-    });
-    $('#widget-radio').widget({
-        hideCloseBtn: false,
-        title: 'Аниме радио',
-        x: $('#cont').width() - 570,
-        y: 119,
-        id: 'radio',
-        content: tpl('radiocode')
-    });
-
 }
 
-function initSounds() {
-    // инициализируем звуки
+// function initSounds() {
+//     // инициализируем звуки
+//
+//     var sounds = {};
+//
+//     sounds.message = new Howl({
+//         urls: ['sounds/in.mp3', 'sounds/in.ogg']
+//     });
+//     sounds.notif = new Howl({
+//         urls: ['sounds/out.mp3', 'sounds/out.ogg']
+//     });
+//     sounds.foryou = new Howl({
+//         urls: ['sounds/foryou.mp3', 'sounds/foryou.ogg']
+//     });
+//
+//     playSound = function (s, p) {
+//         if (isset(p)) {
+//             if (p) sounds[s].play();
+//         } else {
+//             if (soundEnable)
+//                 sounds[s].play();
+//         }
+//     }
+// }
 
-    var sounds = {};
-
-    sounds.message = new Howl({
-        urls: ['sounds/in.mp3', 'sounds/in.ogg']
-    });
-    sounds.notif = new Howl({
-        urls: ['sounds/out.mp3', 'sounds/out.ogg']
-    });
-    sounds.foryou = new Howl({
-        urls: ['sounds/foryou.mp3', 'sounds/foryou.ogg']
-    });
-
-    playSound = function (s, p) {
-        if (isset(p)) {
-            if (p) sounds[s].play();
-        } else {
-            if (soundEnable)
-                sounds[s].play();
-        }
-    }
-}
+playSound = function () {};
 
 function initToolButtons() {
     isNotif = "Notification" in window;
@@ -149,14 +133,6 @@ function bindings() {
 
 }
 
-function setUsersIcons() {
-    $('table[user=77499126] .upriv').attr('src', 'img/usericons/hvostik2.png').attr('title', 'Воин Хвостяра');
-    $('table[user=ShizuoSan] .upriv').attr('src', 'img/usericons/shiz.png').attr('title', 'Кардинал');
-    $('table[user=painter] .upriv').attr('src', 'img/usericons/di.png').attr('title', 'Каратель');
-    $('table[user=166353395] .upriv').attr('src', 'img/usericons/sef.png').attr('title', 'Ордо Еретикус');
-    $('table[user=admin] .upriv').attr('src', 'img/usericons/star.png').attr('title', 'Командующий');
-}
-
 setTimeout(start, 200);
 
 /********** SERVER CALLBACKS ************/
@@ -189,14 +165,7 @@ ch.response.onLogin = function (err, u) {
 
         $('#chat-tabs li.litab').remove();
         $('#chat-rooms').html('');
-
-        $('#colorsBtn').ColorPicker({
-            color: '#' + curColor,
-            onChange: function (hsb, hex, rgb) {
-                curColor = hex;
-            }
-        });
-
+        
         helloStr(u.nick);
         blockOverlay = false;
         hideForm();
@@ -263,11 +232,6 @@ ch.response.onJoinRoom = function (err, d, d2) {
 
         rooms[currentRoom].autoScroll = true;
         rooms[currentRoom].tp = 'room';
-
-        ch.chat('!дворецкий_привет', currentRoom, curColor);
-
-        designImagesUpdate(localStorage.designImages);
-        setUsersIcons();
 
     } else if (err == 'banned') {
         curRoomSel('.rp').html('');
@@ -347,7 +311,6 @@ ch.response.onUserJoined = function (err, d) {
     else
         addNotif(d.room, '<b>' + d.info.nick + '</b> зашел в комнату', '#0F9B14');
 
-    setUsersIcons();
 };
 ch.response.onUserLeaved = function (err, d) {
     addNotif(d.room, '<b>' + d.nick + '</b> покинул комнату', '#E70343');
@@ -732,15 +695,6 @@ function clickDesignItem() {
     }
     if (act == 'theme-dark') {
         designThemeUpdate('theme-dark');
-    }
-    if (act == 'normal') {
-        designImagesUpdate('normal');
-    }
-    if (act == 'small') {
-        designImagesUpdate('small');
-    }
-    if (act == 'hide') {
-        designImagesUpdate('hide');
     }
 
 }
@@ -1146,7 +1100,6 @@ function addMessage(m) {
     }
     $('#' + typ + '-' + m.room).find('.mp').append(mObj);
     toBottom();
-    designImagesUpdate(localStorage.designImages);
 
     $("img.inlinepic", mObj).bindImageLoad(function () {
         $(this).parent().parent().height($(this).height());
@@ -1199,7 +1152,7 @@ function getUserItemHTML(name, nick, avaurl, status, priv, state, awstatus, pm) 
     if (pm) {
         return tpl('useritempm', {
             name: name,
-            url: avaurl,
+            url: imagesUrl + avaurl,
             n: nick,
             st: status,
             states: states[state],
@@ -1208,7 +1161,7 @@ function getUserItemHTML(name, nick, avaurl, status, priv, state, awstatus, pm) 
     } else {
         return tpl('useritem', {
             name: name,
-            url: avaurl,
+            url: imagesUrl + avaurl,
             pt: privasT[priv],
             p: privas[priv],
             priv: priv,

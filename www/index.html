@@ -4,17 +4,13 @@
     <meta charset="utf-8"/>
     <title>Аниме чат Hitagi</title>
     <meta http-equiv="Content-Security-Policy"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="msapplication-tap-highlight" content="no" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
 
     <link rel="stylesheet" type="text/css" href="themes/default/begin.css"/>
-    <link rel="stylesheet" class="my-styles" type="text/css" href="themes/default/start.css"/>
+    <link rel="stylesheet" type="text/css" href="themes/default/start.css"/>
+    <link rel="stylesheet" type="text/css" href="themes/default/theme-default.css"/>
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/howler.min.js"></script>
     <script type="text/javascript" src="js/socket.io.js"></script>
     <script type="text/javascript" src="js/hitagi.js?0"></script>
     <script type="text/javascript" src="js/tools.js"></script>
@@ -23,7 +19,7 @@
         var VKAPIID = 4147366;
         //var currentRoom = 'public';
         var currentRoom = 'lets_play';
-        var ch = hitagiCreate('http://aniavatars.com', true);
+        var ch = hitagiCreate('ws://chat.aniavatars.com', true);
     </script>
     <script type="text/javascript" src="js/chatcore.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
@@ -36,12 +32,7 @@
     </div>
     <div id="usefullinks">
         <ul>
-            <li><a target="_blank" href="http://aniavatars.com/admin/games/">Мини игры</a></li>
-            <li><a target="_blank" href="http://aniavatars.com/admin/chat/rating.php">Рейтинг юзеров</a></li>
-            <li><a target="_blank" href="http://vk.com/hitagi_chat">Наша группа <img src="img/vk.png" alt=""/></a></li>
-            <li><a target="_blank"
-                   href="https://github.com/redspirit/hitagi-client/wiki/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0-%D1%87%D0%B0%D1%82%D0%B0"><b>Правила
-                чата</b></a></li>
+
         </ul>
     </div>
     <div id="auth">
