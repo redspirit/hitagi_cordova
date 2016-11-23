@@ -75,12 +75,6 @@ function bindings() {
     $('#profile_btn').click(clickProfile);
     $('#setava').click(clickSetava);
     $('#statusBtn').click(clickStatusbtn);
-    $('#designBtn').click(clickDesignbtn);
-    $('#designblock').click(function () {
-        $(this).hide()
-    });
-    $('#designblock .db-item').click(clickDesignItem);
-    $('#moderBtn').click(clickModerBut);
     $('#stateBtn').click(clickStatebtn);
     $('#tmenu').click(clickStatebtn2).mouseleave(clickStatebtn2);
     $('#soundBtn').click(clickSoundbtn);
@@ -223,7 +217,6 @@ ch.response.onJoinRoom = function (err, d, d2) {
         hideForm();
         clearUsers();
         fillUsers(d.users);
-        showToolsButtons(d.commonPriv);
 
         startRoomLoads--;
         if (startRoomLoads == 0) {
@@ -408,7 +401,6 @@ ch.response.onSetBan = function (err, d) {
         }
     } else {
         showNotificator('Ошибка при попытке кикнуть: ' + d, 2000);
-        ;
     }
 };
 ch.response.onRoomlist = function (err, d) {
@@ -491,7 +483,6 @@ ch.response.onPM = function (err, d) {
 
 $('.send').live('click', clickSendmess);
 $('.messageinput').live('keydown', keyInputmess);
-$('.uploadImage').live('click', clickUploadimage);
 $('.image-close').live('click', function () {
     $(this).parents('span').html('<span class="deletedmes">Картинка скрыта</span>');
 });
@@ -503,16 +494,6 @@ $('#change_nick').live('click', function () {
     });
     return false;
 });
-$('dd').live('mouseover', function () {
-    $(this).children().children('.eras').show();
-}).live('mouseout', function () {
-    $(this).children().children('.eras').hide();
-});
-$('span.eras').live('click', function () {
-    var mid = $(this).parents('dd').attr('id');
-    ch.eraseMessage(mid);
-});
-
 
 $('.pic-block').live('mouseenter', function () {
     $(this).find('.image-close').fadeIn(200);
@@ -657,14 +638,6 @@ function clickSetava() {
     }
     return false;
 }
-function clickUploadimage() {
-    var ifile = document.getElementById('uplFile');
-    $(ifile).trigger('click');
-    ifile.onchange = function () {
-        showNotificator('Загрузка картинки начата', 2000);
-        uplImage(this.files[0]);
-    }
-}
 function mouseSmile1() {
     $('#smileblock').show();
 }
@@ -684,9 +657,6 @@ function clickStatusbtn() {
     $('#status_but').click(function () {
         ch.setStatus($('#newstatustext').val());
     });
-}
-function clickDesignbtn() {
-    $('#designblock').show();
 }
 function clickDesignItem() {
     var act = $(this).attr('act');
@@ -1022,29 +992,6 @@ function uplAvatar(file) {
     })(file);
     imageReader.readAsDataURL(file);
 }
-function uplImage(file) {
-    if (!file.type.match(/image.*/)) {
-        return true
-    }
-    ;
-    imageReader.onload = (function (aFile) {
-        return function (e) {
-            imaga = document.createElement('img');
-            imaga.src = e.target.result;
-            imaga.onload = function () {
-                ch.uploadImage(imaga.src, function (result) {
-
-                    if (!result)
-                        return showNotificator('Произошла ошибка при загрузке картинки', 3000);
-
-                    ch.chat('uploadimage|' + result.urlImage + '|' + result.urlThumb, currentRoom, curColor);
-
-                });
-            }
-        }
-    })(file);
-    imageReader.readAsDataURL(file);
-}
 function helloStr(nick) {
     $('#hello').html(tpl('hello', {n: nick}));
 }
@@ -1093,10 +1040,12 @@ function addMessage(m) {
     if (!isset(m.date)) m.date = time();
     m = messageAfterProc(m);
     if (m.isBot) {
-        mObj = $('<dt></dt><dd class="bot">' + m.text + '</dd>');
+        mObj = $('<dd class="bot">' + m.text + '</dd>');
     } else {
-        m.text = '<span style="color:#' + m.color + '">' + m.text + '</span>'
-        mObj = $('<dt>' + date('H:i', m.date) + '</dt><dd id="' + m.mid + '"><span class="label">' + m.nick + '</span>' + m.text + '</dd>');
+        m.text = '<span style="color:#' + m.color + '">' + m.text + '</span>';
+        var _dt = date('H:i', m.date);
+        var _dd = '<span class="label">' + m.nick + ':</span> ' + m.text;
+        mObj = $('<div class="msg" id="' + m.mid + '"><dt>' + _dt + '</dt><dda>' + _dd + '</dda></div>');
     }
     $('#' + typ + '-' + m.room).find('.mp').append(mObj);
     toBottom();
@@ -1114,8 +1063,8 @@ function addMessageHist(m) {
     if (m.text == '' || !isset(m.text)) return false;
     if (!isset(m.date)) m.date = time();
     m = messageAfterProc(m);
-    m.text = '<span style="color:#' + m.color + '">' + m.text + '</span>'
-    mObj = $('<dt>' + date('H:i', m.date) + '</dt><dd id="' + m.mid + '"><span class="label">' + m.nick + '</span>' + m.text + '</dd>');
+    m.text = '<span style="color:#' + m.color + '">' + m.text + '</span>';
+    mObj = $('<dd id="' + m.mid + '"><dt>' + date('H:i', m.date) + '</dt> <span class="label">' + m.nick + '</span>' + m.text + '</dd>');
     $('#' + typ + '-' + m.room).find('.mp .more-history').after(mObj);
     return true;
 }
@@ -1130,7 +1079,7 @@ function addNotifInRooms(user, mes, color) {
     toBottom();
 }
 function addTopic(mes, room) {
-    roomSel(room, '.mp').append('<dt></dt><dd class="topic">*** ' + mes + ' ***</dd>');
+    roomSel(room, '.mp').append('<dd class="topic">*** ' + mes + ' ***</dd>');
     $('#topicplace').find('span').html(mes);
     toBottom();
 }
@@ -1197,13 +1146,6 @@ function fillUsers(usr) {
     }
     $('div.profnick').click(nickClick);
     $('.user[user=' + user.login + '] .usmenu').hide();
-}
-function showToolsButtons(priv) {
-    if (priv == 1 || priv == 2 || priv == 3) {
-        $('#moderBtn').show();
-    } else {
-        $('#moderBtn').hide();
-    }
 }
 function saveTabs() {
     var roomtabs = '';
@@ -1334,11 +1276,6 @@ function messageAfterProc(s) {
             setTitle(rooms[s.room]._newMessages);
         }
 
-    }
-
-    // удалялка сообщений для админа
-    if (user.privilege == 0 || user.privilege == 1) {
-        s.text += ' <span class="eras">x</span>';
     }
 
     // смайлы

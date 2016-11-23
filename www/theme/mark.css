@@ -16,8 +16,7 @@ td{
 	position:absolute;
 	top:0;
 	left:0;
-	right: 0;	
-	background: #164870 url(../img/body.jpg) no-repeat top center;
+	right: 0;
 	height: 85px;
 }
 #logo h1{
@@ -244,17 +243,6 @@ ul {
 	border: 0 none;
 	height: 23px;
 	padding: 0 13px;	
-}
-#uploadImage{
-	position: fixed;
-	bottom: 0;
-	right: 0;
-	margin: 3px 223px 3px 3px;
-	width: 18px;
-	height:20px;
-	border: 0;
-	cursor:pointer;
-	background: url('../img/more.png') no-repeat center center;
 }
 .message-pane dt {
 	float: left;

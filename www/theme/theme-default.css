@@ -20,7 +20,6 @@ td {
     top: 0;
     left: 0;
     right: 0;
-    background: #164870 url(body.jpg) no-repeat top center;
     height: 85px;
 }
 
@@ -32,7 +31,6 @@ td {
 #logo h1 a {
     text-indent: -9999px;
     display: block;
-    background: url(logo.png);
     width: 397px;
     height: 80px;
     position: absolute;
@@ -61,7 +59,6 @@ td {
     width: 230px;
     height: 67px;
     padding: 6px;
-    background: #FFF url(sidebar.png) repeat-x;
     border-radius: 0 0 5px 5px;
     -moz-border-radius: 0 0 5px 5px;
     -webkit-border-radius: 0 0 5px 5px;
@@ -80,7 +77,7 @@ td {
 
 #cont {
     position: absolute;
-    top: 85px;
+    top: 0;
     bottom: 0;
     right: 0;
     left: 0;
@@ -130,7 +127,7 @@ ul {
     right: 0;
     font-size: 11px;
     color: #666;
-    width: 220px;
+    width: 132px;
     height: 24px;
     padding-top: 7px;
     border-top: 1px solid #aaa;
@@ -151,27 +148,27 @@ ul {
 }
 
 #statusBtn {
-    background: url('../../img/status.png') no-repeat center center;
+    background: url('../img/status.png') no-repeat center center;
 }
 
 #stateBtn {
-    background: url('../../img/online.png') no-repeat center center;
+    background: url('../img/online.png') no-repeat center center;
 }
 
 #colorsBtn {
-    background: url('../../img/colors.png') no-repeat center center;
+    background: url('../img/colors.png') no-repeat center center;
 }
 
 #smileBtn {
-    background: url('../../img/smile.png') no-repeat center center;
+    background: url('../img/smile.png') no-repeat center center;
 }
 
 #designBtn {
-    background: url('../../img/design.png') no-repeat center center;
+    background: url('../img/design.png') no-repeat center center;
 }
 
 #moderBtn {
-    background: url('../../img/modermenu.png') no-repeat center center;
+    background: url('../img/modermenu.png') no-repeat center center;
     display: none;
 }
 
@@ -181,6 +178,7 @@ ul {
 
 .roster-pane {
     position: absolute;
+    display: none;
     overflow-y: scroll;
     top: 0;
     right: 0;
@@ -217,7 +215,7 @@ ul {
     left: 0;
     height: auto;
     width: auto;
-    margin: 30px 220px 32px 0;
+    margin: 30px 0 32px 0;
     /*background: url(elka.gif) no-repeat 98% 99%, url(ngfon.png) repeat-x left bottom;
     background: url(ngfon.png) repeat-x left bottom;*/
     border-top: 1px solid #C5C5C5;
@@ -225,7 +223,7 @@ ul {
 
 .message-pane {
     margin: 0;
-    padding: 5px 10px 2px 10px;
+    padding: 5px 6px;
 }
 
 .message-form-wrapper {
@@ -234,7 +232,7 @@ ul {
     left: 0;
     right: 0;
     width: auto;
-    margin-right: 220px;
+    margin-right: 131px;
     border-top: 1px solid #ccc;
     background-color: white;
     height: 31px;
@@ -245,7 +243,7 @@ ul {
     bottom: 0;
     left: 0;
     right: 0;
-    margin-right: 340px;
+    margin-right: 144px;
     padding: 0;
 }
 
@@ -262,55 +260,28 @@ ul {
     resize: none;
 }
 
-.message-form .send {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    margin: 3px 247px 3px 3px;
-    width: auto;
-    font-size: 12px;
-    line-height: 12px;
-    border: 0 none;
-    height: 23px;
-    padding: 0 13px;
-}
-
-.uploadImage {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    margin: 3px 223px 3px 3px;
-    width: 18px;
-    height: 20px;
-    border: 0;
-    cursor: pointer;
-    background: url('../../img/more.png') no-repeat center center;
-}
-
+.message-form .send {display: none;}
 .message-pane dt {
-    float: left;
     color: #888;
     font-size: 12px;
-    text-align: right;
     padding-top: 4px;
+    display: block;
+    float: left;
+    width: 36px;
 }
 
-.message-pane dd {
-    padding: 2px 0 1px 130px;
-    margin: 0 0 2px 35px;
-    font-size: 16px;
-    white-space: -o-pre-wrap; /* Opera */
-    word-wrap: break-word; /* Internet Explorer 5.5+ */
+.message-pane .msg {
+    padding: 2px 0;
+    font-size: 14px;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
-.message-pane dd .label {
+.message-pane .msg dda{display: block;padding-left: 36px;}
+
+.message-pane .msg .label {
     font-weight: bold;
     white-space: nowrap;
-    display: block;
-    margin-left: -125px;
-    width: 120px;
-    float: left;
-    overflow: hidden;
 }
 
 .inlinepic {
@@ -351,39 +322,6 @@ span.deletedmes {
     font-style: italic;
 }
 
-dd span.label {
-    cursor: pointer;
-}
-
-#designblock {
-    display: none;
-    position: absolute;
-    width: 180px;
-    border: 1px solid gray;
-    background-color: white;
-    cursor: default;
-    font-size: 12px;
-    bottom: 30px;
-    right: 20px;
-    padding: 3px;
-}
-
-#designblock .db-capt {
-    text-align: center;
-    font-weight: bold;
-    background-color: rgb(236, 236, 236);
-    padding: 2px;
-}
-
-#designblock .db-item {
-    cursor: pointer;
-    padding: 2px;
-}
-
-#designblock .db-item:hover {
-    background-color: rgb(217, 235, 243);
-}
-
 #smileblock {
     display: none;
     position: absolute;
@@ -395,8 +333,8 @@ dd span.label {
     font-size: 12px;
     bottom: 0;
     right: 0;
-    margin-bottom: 25px;
-    margin-right: 180px;
+    margin-bottom: 31px;
+    margin-right: 0;
 }
 
 .smiletabs {
@@ -438,16 +376,15 @@ dd span.label {
 }
 
 #alert {
-    width: 450px;
+    width: 88%;
     display: block;
     background: #fff;
     position: fixed;
     z-index: 10;
-    left: 50%;
-    margin-left: -225px;
     top: 100px;
     padding: 15px;
     text-align: center;
+    margin: auto;
     font-size: 16px;
     border-radius: 8px;
     -moz-border-radius: 8px;
@@ -499,14 +436,15 @@ dd span.label {
     display: none;
     position: absolute;
     width: 130px;
-    border: 1px solid #888;
+    border: 1px solid #dedede;
     cursor: default;
     background-color: white;
-    font-size: 12px;
+    font-size: 14px;
     right: 0;
     bottom: 0;
-    margin-right: 70px;
-    margin-bottom: 28px;
+    margin-right: 1px;
+    margin-bottom: 31px;
+    padding: 4px 9px;
 }
 
 #modmenu {
@@ -536,8 +474,8 @@ dd span.label {
 .titem {
     cursor: pointer;
     background-color: white;
-    padding: 2px;
-    padding-left: 22px;
+    padding: 4px;
+    padding-left: 24px;
     background: no-repeat 2px center;
 }
 
@@ -557,7 +495,7 @@ dd span.label {
 .usmenu {
     width: 16px;
     height: 16px;
-    background: url('../../img/menu.png') no-repeat 2px center;
+    background: url('../img/menu.png') no-repeat 2px center;
     cursor: pointer;
     margin-left: 50px;
     display: inline-block;
@@ -665,6 +603,9 @@ dd.topic {
     font-weight: bold;
     color: #F42;
     display: block;
+    margin: 10px 0;
+    padding: 0;
+    font-size: 14px;
 }
 
 #widget-help {
@@ -808,7 +749,7 @@ div.clear {
 
 #chat-tabs {
     list-style: none;
-    margin: 0 220px 0 0;
+    margin: 0;
     padding: 0;
     overflow: auto;
     overflow-y: hidden;
