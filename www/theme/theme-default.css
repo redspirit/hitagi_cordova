@@ -123,16 +123,16 @@ ul {
 
 #chat-toolbar {
     position: fixed;
-    bottom: 0;
+    bottom: 4px;
     right: 0;
     font-size: 11px;
     color: #666;
     width: 132px;
     height: 24px;
-    padding-top: 7px;
-    border-top: 1px solid #aaa;
+    padding-top: 4px;
     background-color: white;
-    display: block;
+    z-index: 9999;
+    display: none;
 }
 
 #chat-toolbar li {
@@ -177,16 +177,7 @@ ul {
 }
 
 .roster-pane {
-    position: absolute;
-    display: none;
-    overflow-y: scroll;
-    top: 0;
-    right: 0;
-    bottom: 0;
     width: 220px;
-    margin: 30px 0 32px 0;
-    /*background: url(dino.png) no-repeat 90% 100%, url(ngfon.png) repeat-x right bottom;*/
-    border-top: 1px solid #C5C5C5;
 }
 
 .roster-pane .user {
@@ -231,33 +222,27 @@ ul {
     bottom: 0;
     left: 0;
     right: 0;
-    width: auto;
-    margin-right: 131px;
+    margin-right: 0;
     border-top: 1px solid #ccc;
-    background-color: white;
-    height: 31px;
+    height: 34px;
 }
 
 .message-form {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin-right: 144px;
-    padding: 0;
 }
 
 .message-form .messageinput {
-    border: 0 none;
-    padding: 5px 10px;
-    font-size: 14px;
-    width: 100%;
-    display: block;
+    font-size: 17px;
     outline-width: 0;
     background-color: white;
-    height: 20px;
     font-family: inherit;
     resize: none;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    left: 0;
+    right: 0;
+    border: 0;
+    padding: 7px;
 }
 
 .message-form .send {display: none;}
@@ -819,6 +804,7 @@ div.clear {
 #chat-tabs #add-room-tab {
     width: 20px;
     height: 19px;
+    display: none;
 }
 
 #chat-tabs #add-room-tab img {
@@ -1009,3 +995,30 @@ div#cont.head-hide {
     color: #164870;
     font-size: 11px;
 }
+
+.menu-button{
+    position: absolute;
+    z-index: 999;
+    font-size: 23px;
+    right: 6px;
+    top: 0px;
+    padding: 4px;
+}
+.main-menu{
+    display: none;
+    position: absolute;
+    overflow-y: scroll;
+    top: -30px;
+    right: 0;
+    bottom: -33px;
+    width: 220px;
+    margin: 30px 0 32px 0;
+    background-color: #fff;
+    border-left: 1px solid #C5C5C5;
+    z-index: 999;
+    box-shadow: -2px 0px 26px 0px rgba(0,0,0,0.75);
+}
+.menu-tools{
+    height: 32px;
+}
+.to-back{font-size: 24px;float: right;padding: 4px 12px;}

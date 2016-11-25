@@ -3,7 +3,7 @@ var blockOverlay = true, clickOnProf = 0, currentType = 'room';
 var soundEnable, notifEnable, playSound, imaga, blockHide = true;
 var imageReader = new FileReader();
 var user, rooms = {}, vkmid, curColor, isFocus = true, startRoomLoads = 0;
-var isNotif, curState, reciveMessCount = 30, hisoryLimit = 50;
+var isNotif, curState, reciveMessCount = 50, hisoryLimit = 50;
 var mhist = {cur: '', old: ''}, correctLatMess = false;
 var titleDefault = 'Аниме чат Hitagi';
 var imagesUrl = 'http://chat.aniavatars.com';
@@ -24,6 +24,39 @@ function createElements() {
         $('#tmenu').append(tpl('statusitem', {s1: states[i], s2: statesT[i], n: i}));
     }
 }
+
+document.addEventListener("deviceready", function(){
+
+    cordova.plugins.backgroundMode.setDefaults({
+        title:  "Guardia партнер",
+        ticker: "Guardia работает в фоне",
+        text:   "Нажмите, чтобы открыть приложение"
+    });
+    cordova.plugins.backgroundMode.enable();
+    cordova.plugins.backgroundMode.onactivate = function () {
+        console.log("backgroundMode onactivate");
+    };
+    cordova.plugins.backgroundMode.ondeactivate = function () {
+        console.log("backgroundMode ondeactivate");
+    };
+    cordova.plugins.backgroundMode.onfailure  = function (errorCode) {
+        console.log("backgroundMode onfailure", errorCode);
+    };
+
+    cordova.plugins.notification.local.schedule({
+        id: 10,
+        title: "Вам написал Spirit",
+        text: "Привты манюкьки чет там как дела???",
+        icon: "http://aniavatars.com/data/avatars/149/778.png"
+    });
+
+    cordova.plugins.notification.local.on("click", function (notification) {
+        if (notification.id == 10) {
+            console.log('OKKOKOKOKOK', notification.data);
+        }
+    });
+
+}, false);
 
 // function initSounds() {
 //     // инициализируем звуки
@@ -87,6 +120,10 @@ function bindings() {
     $('.stateitem').click(clickStateitem);
     $('.smiletabs').click(function () {
         return false
+    });
+    $('.menu-button').click(function(){
+        $('.main-menu').show();
+        $('#chat-toolbar').show();
     });
     $('.smiletabs div').click(clickSmiletab);
     $(window).focus(function () {
@@ -387,7 +424,6 @@ ch.response.onKick = function (err, d) {
         }
     } else {
         showNotificator('Ошибка при попытке кикнуть: ' + d, 2000);
-        ;
     }
 };
 ch.response.onSetBan = function (err, d) {
@@ -616,7 +652,10 @@ $('.more-history').live('click', function () {
     var skip = curRoomSel('.mp dd span.label').length;
     ch.getHistory(rid.split('-')[1], skip, hisoryLimit);
 });
-
+$(document).on('click', '.to-back', function () {
+    $('.main-menu').hide();
+    $('#chat-toolbar').hide();
+});
 
 /********** INTERFACE EVENTS ************/
 function clickLogout() {
@@ -1063,8 +1102,12 @@ function addMessageHist(m) {
     if (m.text == '' || !isset(m.text)) return false;
     if (!isset(m.date)) m.date = time();
     m = messageAfterProc(m);
+
     m.text = '<span style="color:#' + m.color + '">' + m.text + '</span>';
-    mObj = $('<dd id="' + m.mid + '"><dt>' + date('H:i', m.date) + '</dt> <span class="label">' + m.nick + '</span>' + m.text + '</dd>');
+    var _dt = date('H:i', m.date);
+    var _dd = '<span class="label">' + m.nick + ':</span> ' + m.text;
+    mObj = $('<div class="msg" id="' + m.mid + '"><dt>' + _dt + '</dt><dda>' + _dd + '</dda></div>');
+
     $('#' + typ + '-' + m.room).find('.mp .more-history').after(mObj);
     return true;
 }
@@ -1288,72 +1331,3 @@ function messageAfterProc(s) {
 
     return s;
 }
-
-/********** TEMPLATES ************/
-
-var smiles = {
-    1: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167],
-    3: [501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 534, 535, 536, 537, 538],
-    2: [800, 801, 802, 803, 804, 805, 806, 807, 808, 809, 810, 811, 812, 813, 814, 815, 816, 817, 818, 819, 820, 821, 822, 823, 824, 825, 826, 827, 828, 829, 830, 831, 832, 833, 834, 836, 837, 838, 839, 840, 841, 843, 844, 845, 846, 847, 848, 849, 851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880, 881, 882, 883, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921, 922, 923, 924, 925, 926, 927, 928, 929, 930, 931, 932, 933, 934, 935, 936, 937, 938, 939, 940, 941, 943, 944, 945, 946, 947, 948, 949, 950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980, 981, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991, 992, 993, 994, 995, 996, 997, 998, 999],
-}
-states[0] = 'online.png';
-statesT[0] = 'Онлайн';
-states[1] = 'away.png';
-statesT[1] = 'Отошел';
-states[2] = 'busy.png';
-statesT[2] = 'Занят';
-states[3] = 'stop.png';
-statesT[3] = 'Отсутствую';
-states[4] = 'work.png';
-statesT[4] = 'Работаю';
-states[5] = 'rest.png';
-statesT[5] = 'Отдыхаю';
-states[6] = 'game.png';
-statesT[6] = 'Играю';
-states[7] = 'music.png';
-statesT[7] = 'Слушаю музыку';
-states[8] = 'films.png';
-statesT[8] = 'Смотрю фильм';
-states[9] = 'food.png';
-statesT[9] = 'Кушаю';
-states[10] = 'coffee.png';
-statesT[10] = 'Чай / кофе';
-states[11] = 'home.png';
-statesT[11] = 'Дела по дому';
-states[12] = 'read.png';
-statesT[12] = 'Читаю';
-states[13] = 'sleep.png';
-statesT[13] = 'Сплю';
-states[14] = 'pirat.png';
-statesT[14] = 'Пират';
-
-privas[0] = 'empty.png';
-privasT[0] = '';
-privas[1] = 'admin.png';
-privasT[1] = 'Админ';
-privas[2] = 'moder.png';
-privasT[2] = 'Модератор';
-privas[3] = 'owner.png';
-privasT[3] = 'Хозяин комнаты';
-privas[4] = 'user.png';
-privasT[4] = 'Пользователь';
-privas[5] = 'novoice.png';
-privasT[5] = 'Без голоса';
-
-umItems[1] = 'Сделать админом';
-umItems[2] = 'Разжаловать админа';
-umItems[3] = 'Сделать модератором';
-umItems[4] = 'Разжаловать модера';
-umItems[5] = 'Забанить';
-umItems[6] = 'Кикнуть';
-umItems[7] = 'Лишить голоса';
-umItems[8] = 'Вернуть голос';
-
-var gender = {0: 'Не указано', 1: 'Мальчик', 2: 'Девочка'}
-var awayStatuses = {
-    0: 'Бдит',
-    1: 'Отвлекся',
-    2: 'Отошел',
-    3: 'Задремал',
-    4: 'Ушел'
-};

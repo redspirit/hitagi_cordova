@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <meta name="format-detection" content="telephone=no">
 
+    <link rel="stylesheet" type="text/css" href="theme/font-awesome.min.css"/>
     <link rel="stylesheet" type="text/css" href="theme/begin.css"/>
     <link rel="stylesheet" type="text/css" href="theme/theme-default.css"/>
     <script type="text/javascript" src="cordova.js"></script>
@@ -22,8 +23,8 @@
     <script type="text/javascript" src="http://vk.me/js/api/openapi.js?1"></script>
     <script type="text/javascript">
         var VKAPIID = 4147366;
-        //var currentRoom = 'public';
-        var currentRoom = 'lets_play';
+        var currentRoom = 'public';
+        //var currentRoom = 'lets_play';
         var ch = hitagiCreate('ws://chat.aniavatars.com', true);
     </script>
     <script type="text/javascript" src="js/chatcore.js"></script>
@@ -84,6 +85,7 @@
             <li id="soundBtn" title="Включить / выключить звук"></li>
             <li id="notifBtn" title="Включить / выключить оповещения"></li>
         </ul>
+        <div class="menu-button fa fa-bars"></div>
         <div id="chat-rooms" class="rooms"></div>
     </div>
 </div>
