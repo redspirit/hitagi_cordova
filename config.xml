@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.aniavatars.chatapp" version="1.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.aniavatars.chatapp" version="1.0.4" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Hitagi Chat</name>
     <description>
         Mobile app for Hitagi Chat
@@ -8,7 +8,10 @@
         Red Spirit
     </author>
     <content src="index.html" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="prerendered-icon" value="true" />
     <plugin name="cordova-plugin-whitelist" spec="1" />
+    <plugin name="cordova-plugin-background-mode" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -18,10 +21,12 @@
     <allow-intent href="geo:*" />
     <platform name="android">
         <allow-intent href="market:*" />
-    </platform>
-    <platform name="ios">
-        <allow-intent href="itms:*" />
-        <allow-intent href="itms-apps:*" />
+        <icon density="ldpi" src="res/mdpi.png" />
+        <icon density="mdpi" src="res/mdpi.png" />
+        <icon density="hdpi" src="res/hdpi.png" />
+        <icon density="xhdpi" src="res/xhdpi.png" />
+        <icon density="xxhdpi" src="res/xxhdpi.png" />
+        <icon density="xxxhdpi" src="res/xxxhdpi.png" />
     </platform>
     <engine name="android" spec="~6.0.0" />
 </widget>

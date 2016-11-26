@@ -92,7 +92,7 @@ td {
 
 .is-loading {
     position: absolute;
-    top: 85px;
+    top: 0;
     right: 0;
     bottom: 0;
     left: 0;
@@ -122,16 +122,15 @@ ul {
 }
 
 #chat-toolbar {
-    position: fixed;
+    position: absolute;
     bottom: 4px;
-    right: 0;
+    right: 7px;
     font-size: 11px;
     color: #666;
     width: 132px;
     height: 24px;
     padding-top: 4px;
-    background-color: white;
-    z-index: 9999;
+    z-index: 9;
     display: none;
 }
 
@@ -148,11 +147,13 @@ ul {
 }
 
 #statusBtn {
-    background: url('../img/status.png') no-repeat center center;
+    font-size: 20px;
+    padding: 6px;
 }
 
 #stateBtn {
-    background: url('../img/online.png') no-repeat center center;
+    font-size: 20px;
+    padding: 6px;
 }
 
 #colorsBtn {
@@ -160,7 +161,12 @@ ul {
 }
 
 #smileBtn {
-    background: url('../img/smile.png') no-repeat center center;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 24px;
+    z-index: 10;
+    padding: 5px 8px;
 }
 
 #designBtn {
@@ -173,7 +179,8 @@ ul {
 }
 
 #soundBtn, #notifBtn {
-    background: no-repeat center center;
+    font-size: 20px;
+    padding: 6px;
 }
 
 .roster-pane {
@@ -238,7 +245,7 @@ ul {
     resize: none;
     position: fixed;
     bottom: 0;
-    width: 100%;
+    width: 90%;
     left: 0;
     right: 0;
     border: 0;
@@ -310,20 +317,18 @@ span.deletedmes {
 #smileblock {
     display: none;
     position: absolute;
-    width: 240px;
-    height: 365px;
+    width: 290px;
+    height: 440px;
     border: 1px solid gray;
     background-color: white;
-    cursor: default;
-    font-size: 12px;
-    bottom: 0;
-    right: 0;
-    margin-bottom: 31px;
-    margin-right: 0;
+    font-size: 16px;
+    top: 63px;
+    left: 50%;
+    margin-left: -145px;
 }
 
 .smiletabs {
-    width: 25px;
+    width: 40px;
     border-right: 1px solid gray;
 }
 
@@ -331,7 +336,7 @@ span.deletedmes {
     border: 1px solid gray;
     margin: 2px;
     text-align: center;
-    padding: 2px;
+    padding: 9px 2px;
     cursor: pointer;
     background-color: #D6E5F8;
 }
@@ -342,7 +347,7 @@ span.deletedmes {
 }
 
 #smCont {
-    height: 365px;
+    height: 440px;
     overflow-x: hidden;
     overflow-y: scroll;
     display: block;
@@ -350,8 +355,8 @@ span.deletedmes {
 
 #smWrap img {
     padding: 2px;
-    width: 45px;
-    height: 45px;
+    width: 58px;
+    height: 58px;
     cursor: pointer;
 }
 
@@ -361,7 +366,7 @@ span.deletedmes {
 }
 
 #alert {
-    width: 88%;
+    width: 100%;
     display: block;
     background: #fff;
     position: fixed;
@@ -371,11 +376,7 @@ span.deletedmes {
     text-align: center;
     margin: auto;
     font-size: 16px;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
-    -khtml-border-radius: 8px;
-    border: 8px solid #757575;
+    box-sizing: border-box;
 }
 
 #alert h1 {
@@ -397,13 +398,17 @@ span.deletedmes {
 }
 
 #alert input[type=text], #alert input[type=password] {
-    padding: 2px;
+    font-size: 16px;
+    padding: 4px 4px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 #alert .close-form {
     float: right;
     margin: 0;
     cursor: pointer;
+    display: none;
 }
 
 #overlay {
@@ -420,16 +425,15 @@ span.deletedmes {
 #tmenu {
     display: none;
     position: absolute;
-    width: 130px;
-    border: 1px solid #dedede;
+    width: 180px;
     cursor: default;
     background-color: white;
     font-size: 14px;
-    right: 0;
-    bottom: 0;
-    margin-right: 1px;
-    margin-bottom: 31px;
     padding: 4px 9px;
+    z-index: 20;
+    top: 33px;
+    left: 50%;
+    margin-left: -90px;
 }
 
 #modmenu {
@@ -767,14 +771,7 @@ div.clear {
 }
 
 #chat-tabs a.active {
-    background: #ffffff;
-    background: -moz-linear-gradient(top, #ffffff 0%, #e5e5e5 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(100%, #e5e5e5));
-    background: -webkit-linear-gradient(top, #ffffff 0%, #e5e5e5 100%);
-    background: -o-linear-gradient(top, #ffffff 0%, #e5e5e5 100%);
-    background: -ms-linear-gradient(top, #ffffff 0%, #e5e5e5 100%);
-    background: linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
-    border: 1px solid rgb(196, 196, 196);
+    background: #deefff;
     border-bottom: none;
 }
 
@@ -891,9 +888,10 @@ div#cont.head-hide {
 
 .sk-folding-cube {
     margin: 200px auto;
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     position: relative;
+    margin-top: 100px;
     -webkit-transform: rotateZ(45deg);
     transform: rotateZ(45deg);
 }
@@ -1013,7 +1011,7 @@ div#cont.head-hide {
     bottom: -33px;
     width: 220px;
     margin: 30px 0 32px 0;
-    background-color: #fff;
+    background-color: #f0f0f0;
     border-left: 1px solid #C5C5C5;
     z-index: 999;
     box-shadow: -2px 0px 26px 0px rgba(0,0,0,0.75);
@@ -1021,4 +1019,10 @@ div#cont.head-hide {
 .menu-tools{
     height: 32px;
 }
-.to-back{font-size: 24px;float: right;padding: 4px 12px;}
+.to-back{font-size: 20px;float: right;padding: 6px 12px;}
+.loading-logo-text{
+    color: #267dc2;
+    text-transform: uppercase;
+    margin-top: -60px;
+}
+#newstatustext{}

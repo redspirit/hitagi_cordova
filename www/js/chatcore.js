@@ -28,8 +28,8 @@ function createElements() {
 document.addEventListener("deviceready", function(){
 
     cordova.plugins.backgroundMode.setDefaults({
-        title:  "Guardia партнер",
-        ticker: "Guardia работает в фоне",
+        title:  "Hitagi chat",
+        ticker: "Hitagi работает в фоне",
         text:   "Нажмите, чтобы открыть приложение"
     });
     cordova.plugins.backgroundMode.enable();
@@ -42,13 +42,6 @@ document.addEventListener("deviceready", function(){
     cordova.plugins.backgroundMode.onfailure  = function (errorCode) {
         console.log("backgroundMode onfailure", errorCode);
     };
-
-    cordova.plugins.notification.local.schedule({
-        id: 10,
-        title: "Вам написал Spirit",
-        text: "Привты манюкьки чет там как дела???",
-        icon: "http://aniavatars.com/data/avatars/149/778.png"
-    });
 
     cordova.plugins.notification.local.on("click", function (notification) {
         if (notification.id == 10) {
@@ -89,10 +82,10 @@ function initToolButtons() {
     isNotif = "Notification" in window;
     if (cookie("sounds") == 'off') {
         soundEnable = false;
-        $('#soundBtn').css('backgroundImage', 'url(img/soundoff.png)');
+        $('#soundBtn').removeClass('fa-bell').addClass('fa-bell-slash');
     } else {
         soundEnable = true;
-        $('#soundBtn').css('backgroundImage', 'url(img/soundon.png)');
+        $('#soundBtn').removeClass('fa-bell-slash').addClass('fa-bell');
     }
     if (cookie("notifs") == 'on') {
         notifEnable = true;
@@ -107,10 +100,7 @@ function bindings() {
     $('#logout_btn').click(clickLogout);
     $('#profile_btn').click(clickProfile);
     $('#setava').click(clickSetava);
-    $('#statusBtn').click(clickStatusbtn);
-    $('#stateBtn').click(clickStatebtn);
     $('#tmenu').click(clickStatebtn2).mouseleave(clickStatebtn2);
-    $('#soundBtn').click(clickSoundbtn);
     $('#notifBtn').click(clickNotifbtn);
     $('#smileBtn').click(mouseSmile1);
     $('#add-room-tab img').click(clickRoomsbtn);
@@ -124,6 +114,7 @@ function bindings() {
     $('.menu-button').click(function(){
         $('.main-menu').show();
         $('#chat-toolbar').show();
+        $('#overlay').show();
     });
     $('.smiletabs div').click(clickSmiletab);
     $(window).focus(function () {
@@ -155,7 +146,7 @@ function bindings() {
 
     });
     for (var i in smiles[1]) {
-        $('#smWrap').append('<img num="' + smiles[1][i] + '" src="img/smiles/' + smiles[1][i] + '.gif" alt="" />');
+        $('#smWrap').append('<img num="' + smiles[1][i] + '" src="' + imagesUrl + '/img/smiles/' + smiles[1][i] + '.gif" alt="" />');
     }
 
     $(window).bind("beforeunload", function () {
@@ -391,7 +382,6 @@ ch.response.onSetState = function (err, d) {
     if (!err) {
         roomSel('', '.rp table[user=' + d.user + '] .stateSign').attr('src', 'img/' + states[d.val]);
         roomSel('', '.rp table[user=' + d.user + '] .statetxt').html(statesT[d.val]);
-        if (d.user == user.login)$('#stateBtn').css('backgroundImage', 'url(img/' + states[d.val] + ')');
         addNotifInRooms(d.user, '<b>' + d.nick + '</b> изменил статус на: <b>' + statesT[d.val] + '</b>', '#0F419B');
     } else {
         showNotificator('Ошибка установки состояния: ' + d, 2000);
@@ -569,7 +559,8 @@ $('dd span.label').live('click', function () {
     }
 });
 $('#smWrap img').live('click', function () {
-    curRoomSel('.messageinput').val(curRoomSel('.messageinput').val() + ' *smile' + $(this).attr('num') + '* ').focus();
+    curRoomSel('.messageinput').val(curRoomSel('.messageinput').val() + ' *smile' + $(this).attr('num') + '* ');
+    hideForm();
 });
 $('.profava').live('click', function () {
     var nn = $(this).attr('nn');
@@ -655,7 +646,11 @@ $('.more-history').live('click', function () {
 $(document).on('click', '.to-back', function () {
     $('.main-menu').hide();
     $('#chat-toolbar').hide();
+    hideForm();
 });
+$(document).on('click', '#stateBtn', clickStatebtn);
+$(document).on('click', '#statusBtn', clickStatusbtn);
+$(document).on('click', '#soundBtn', clickSoundbtn);
 
 /********** INTERFACE EVENTS ************/
 function clickLogout() {
@@ -674,24 +669,26 @@ function clickSetava() {
     ifile.onchange = function () {
         $('#avalabel').html('Загружается...');
         uplAvatar(this.files[0]);
-    }
+    };
     return false;
 }
 function mouseSmile1() {
     $('#smileblock').show();
+    $('#overlay').show();
 }
 function mouseSmile2() {
-    $('#smileblock').hide();
+    hideForm();
 }
 function clickSmiletab() {
     var tab = $(this).attr('tab') * 1;
     var sm = smiles[tab];
     $('#smWrap').html('');
     for (var i in sm) {
-        $('#smWrap').append('<img num="' + sm[i] + '" src="img/smiles/' + sm[i] + '.gif" alt="" />');
+        $('#smWrap').append('<img num="' + sm[i] + '" src="' + imagesUrl + '/img/smiles/' + sm[i] + '.gif" alt="" />');
     }
 }
 function clickStatusbtn() {
+    $('.main-menu').hide();
     showForm(tpl('status'), 'Мой статусный текст');
     $('#status_but').click(function () {
         ch.setStatus($('#newstatustext').val());
@@ -739,10 +736,12 @@ function topicChange() {
     });
 }
 function clickStatebtn() {
+    $('.main-menu').hide();
     $('#tmenu').show();
+    $('#overlay').show();
 }
 function clickStatebtn2() {
-    $('#tmenu').hide();
+    hideForm();
 }
 function clickStateitem() {
     var v = $(this).attr('val') * 1;
@@ -786,11 +785,11 @@ function keyInputmess(event) {
 function clickSoundbtn() {
     if (soundEnable) {
         soundEnable = false;
-        $(this).css('backgroundImage', 'url(img/soundoff.png)');
+        $(this).removeClass('fa-bell').addClass('fa-bell-slash');
         cookie("sounds", 'off', {expires: 99});
     } else {
         soundEnable = true;
-        $(this).css('backgroundImage', 'url(img/soundon.png)');
+        $(this).removeClass('fa-bell-slash').addClass('fa-bell');
         cookie("sounds", 'on', {expires: 99});
     }
 }
@@ -827,6 +826,7 @@ function clickNotifbtn() {
 
 }
 function nickClick() {
+    $('.main-menu').hide();
     var cluser = $(this).parents('.user').attr('user');
     clickOnProf = 2;
     ch.getProfile(cluser);
@@ -935,7 +935,10 @@ function hideForm() {
     if (blockOverlay) return false;
     $('#alert').hide();
     $('#overlay').hide();
-    curRoomSel('.messageinput').focus();
+    $('#tmenu').hide();
+    $('.main-menu').hide();
+    $('#smileblock').hide();
+    //curRoomSel('.messageinput').focus();
 }
 function curRoomSel(sel) {
     return $('#' + currentType + '-' + currentRoom).find(sel);
@@ -1200,21 +1203,18 @@ function saveTabs() {
 }
 function showDesktopNotif(capt, mes, userpic) {
 
-    if (!(isNotif && notifEnable && mes) || isFocus)
-        return;
+    // if (!(isNotif && notifEnable && mes) || isFocus)
+    //     return;
 
-    var nn = new Notification(capt, {
-        body: strip_tags(stripBB(mes)).substring(0, 200),
+    if(!cordova)
+        return false;
+
+    cordova.plugins.notification.local.schedule({
+        id: 10,
+        title: capt,
+        text: strip_tags(stripBB(mes)),
         icon: userpic
     });
-
-    nn.onclick = function () {
-        this.close();
-        curRoomSel('.messageinput').focus();
-    }
-    var notif_timer = setTimeout(function () {
-        nn.close();
-    }, 5000);
 
 }
 function privGrid(a, b) {
@@ -1246,8 +1246,7 @@ function showAuthWindow() {
 }
 function VKauthProc(data) {
     if (!data) {
-        alert('Что-то не так, нет ответа от ВК');
-        return false;
+        return alert('Что-то не так, нет ответа от ВК');
     }
     ch.login(data.uid, {
         hash: data.hash,
@@ -1305,7 +1304,7 @@ function messageAfterProc(s) {
         if (s.text.match(user.nick + ':')) {
             s.text = '<span class="for-you">' + s.text + '</span>';
             playSound('foryou', true);
-            showDesktopNotif('Обращение от ' + usernick, s.text, userpic);
+            showDesktopNotif('Вам написал ' + usernick, s.text, userpic);
         } else {
             if (s.user != user.login) {
                 var place = s.pm ? 'ЛС' : rooms[s.room].caption;
@@ -1323,9 +1322,8 @@ function messageAfterProc(s) {
 
     // смайлы
     s.text = s.text.replace(/\*smile(\d+)\*/gm, function (a, b) {
-        return '<img src="img/smiles/' + b + '.gif" alt="" />';
+        return '<img src="' + imagesUrl + '/img/smiles/' + b + '.gif" alt="" />';
     });
-
 
     s.text = BBproc(s.text);
 
