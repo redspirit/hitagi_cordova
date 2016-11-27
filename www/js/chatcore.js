@@ -97,9 +97,6 @@ function initToolButtons() {
 }
 
 function bindings() {
-    $('#logout_btn').click(clickLogout);
-    $('#profile_btn').click(clickProfile);
-    $('#setava').click(clickSetava);
     $('#tmenu').click(clickStatebtn2).mouseleave(clickStatebtn2);
     $('#notifBtn').click(clickNotifbtn);
     $('#smileBtn').click(mouseSmile1);
@@ -155,13 +152,12 @@ function bindings() {
 
 }
 
-setTimeout(start, 200);
-
 /********** SERVER CALLBACKS ************/
 
 ch.response.onConnect = function () {
 
     $('.reconnection-panel').hide();
+
     if (ch.autoLogin()) {
         //hideForm()
     } else {
@@ -169,6 +165,7 @@ ch.response.onConnect = function () {
         $('.is-loading').hide();
         showAuthWindow();
     }
+
 };
 ch.response.onDisconnect = function () {
     $('.reconnection-panel').show();
@@ -512,7 +509,7 @@ $('.messageinput').live('keydown', keyInputmess);
 $('.image-close').live('click', function () {
     $(this).parents('span').html('<span class="deletedmes">Картинка скрыта</span>');
 });
-$('#change_nick').live('click', function () {
+$('.change-nick').live('click', function () {
     var form = tpl('newnick', {txt: user.nick});
     showForm(form, 'Изменить ник');
     $('#newnick_but').click(function () {
@@ -565,6 +562,7 @@ $('#smWrap img').live('click', function () {
 $('.profava').live('click', function () {
     var nn = $(this).attr('nn');
     if (user.nick != nn) {
+        hideForm();
         curRoomSel('.messageinput').val(curRoomSel('.messageinput').val() + nn + ': ').focus();
     }
 });
@@ -651,19 +649,24 @@ $(document).on('click', '.to-back', function () {
 $(document).on('click', '#stateBtn', clickStatebtn);
 $(document).on('click', '#statusBtn', clickStatusbtn);
 $(document).on('click', '#soundBtn', clickSoundbtn);
+$(document).on('click', '.to-logout', clickLogout);
+$(document).on('click', '.to-profile', clickProfile);
+$(document).on('click', '.change-avatar', clickSetava);
 
 /********** INTERFACE EVENTS ************/
 function clickLogout() {
+    hideForm();
     ch.logOut();
     return false;
 }
 function clickProfile() {
+    hideForm();
     clickOnProf = 1;
     ch.getProfile(user.login);
     return false;
 }
 function clickSetava() {
-    var form = tpl('setava', {src: user.avasrc});
+    var form = tpl('setava', {src: imagesUrl + user.avasrc});
     showForm(form, 'Установка аватарки');
     var ifile = document.getElementById('inputfile');
     ifile.onchange = function () {
@@ -915,7 +918,8 @@ function setTitle(count) {
 }
 
 function tpl(tname, variables) {
-    template = templates[tname];
+    var template = templates[tname];
+    console.log('>>', tname);
     return template.replace(new RegExp('\{(.*?)\}', 'g'), function (a, b) {
         return isset(variables[b]) ? variables[b] : '';
     });
@@ -927,7 +931,6 @@ function scrollPane() {
     rooms[roomName].autoScroll = (this.offsetHeight + this.scrollTop >= this.scrollHeight);
 };
 function showForm(s, capt, top) {
-    if (!isset(top)) top = '100px';
     $('#alert').html('<div class="close-form"><img title="Закрыть" src="img/close-form.png" alt="" /></div><h1>' + capt + '</h1> ' + s).css('top', top).show();
     $('#overlay').show();
 }
@@ -975,7 +978,7 @@ function allRoomsLoaded() {
 function addPmTab(friend) {
 
     var usr = friend.login;
-    var ssr = {}
+    var ssr = {};
     ssr[user.login] = user;
     ssr[usr] = friend;
 
@@ -1048,7 +1051,7 @@ function showUserProfileWindow(udat) {
 }
 
 function showMyProfileWindow(udat, vis) {
-    showForm(tpl('myprof'), 'Мой профиль', '100px');
+    showForm(tpl('myprof'), 'Мой профиль');
     for (var us in udat) {
         $('#pr_' + us).val(udat[us]);
     }

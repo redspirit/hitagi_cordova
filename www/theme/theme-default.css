@@ -163,10 +163,11 @@ ul {
 #smileBtn {
     position: absolute;
     bottom: 0;
-    right: 0;
-    font-size: 24px;
+    left: 0;
+    font-size: 22px;
     z-index: 10;
-    padding: 5px 8px;
+    padding: 6px 8px;
+    color: #7d7d7d;
 }
 
 #designBtn {
@@ -188,7 +189,7 @@ ul {
 }
 
 .roster-pane .user {
-    font-size: 12px;
+    font-size: 14px;
     margin: 0 4px 2px 4px;
     display: block;
     color: #666;
@@ -231,28 +232,29 @@ ul {
     right: 0;
     margin-right: 0;
     border-top: 1px solid #ccc;
-    height: 34px;
+    height: 33px;
+    background-color: #fff;
 }
 
 .message-form {
 }
 
 .message-form .messageinput {
-    font-size: 17px;
+    font-size: 16px;
     outline-width: 0;
     background-color: white;
     font-family: inherit;
     resize: none;
-    position: fixed;
-    bottom: 0;
-    width: 90%;
-    left: 0;
-    right: 0;
+    position: absolute;
+    bottom: 1px;
+    left: 30px;
     border: 0;
     padding: 7px;
+    display: block;
+    width: 80%;
 }
 
-.message-form .send {display: none;}
+.message-form .send {position: absolute;bottom: 0;right: 0;padding: 8px 10px;font-size: 19px;color: #3d5070;}
 .message-pane dt {
     color: #888;
     font-size: 12px;
@@ -277,11 +279,8 @@ ul {
 }
 
 .inlinepic {
-    -webkit-box-shadow: 0px 0px 4px rgba(50, 50, 50, 0.75);
-    -moz-box-shadow: 0px 0px 4px rgba(50, 50, 50, 0.75);
-    box-shadow: 0px 0px 4px rgba(50, 50, 50, 0.75);
-    max-height: 600px;
-    max-width: 600px;
+    /* max-height: 600px; */
+    max-width: 97%;
 }
 
 .normal-pic {
@@ -367,11 +366,11 @@ span.deletedmes {
 
 #alert {
     width: 100%;
-    display: block;
+    display: none;
     background: #fff;
     position: fixed;
-    z-index: 10;
-    top: 100px;
+    z-index: 20;
+    top: 30px;
     padding: 15px;
     text-align: center;
     margin: auto;
@@ -385,7 +384,7 @@ span.deletedmes {
 }
 
 #alert div {
-    margin: 15px;
+    margin-top: 24px;
     font-size: 14px;
 }
 
@@ -413,13 +412,14 @@ span.deletedmes {
 
 #overlay {
     position: fixed;
-    z-index: 9;
+    z-index: 15;
     top: 0;
     left: 0;
     height: 100%;
     width: 100%;
     background: black;
     opacity: 0.7;
+    display: none;
 }
 
 #tmenu {
@@ -514,7 +514,7 @@ span.deletedmes {
     font-weight: bold;
     cursor: pointer;
     margin-top: -5px;
-    font-size: 13px;
+    font-size: 16px;
     margin-bottom: 2px;
 }
 
@@ -547,9 +547,9 @@ img.profava {
 }
 
 #proftabl {
-    font-size: 13px;
+    /* font-size: 13px; */
     width: 100%;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 #proftabl td {
@@ -579,6 +579,7 @@ img.profava {
     text-align: center;
     left: 50%;
     margin-left: -400px;
+    display:none;
 }
 
 dd.notif {
@@ -628,12 +629,14 @@ dd.bot {
     color: #fff;
     vertical-align: middle;
     zoom: 1;
-    *display: inline;
+    *
+    display: inline;
     -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
     text-decoration: none;
     cursor: pointer;
+    display: inline-block;
 }
 
 .btn:hover {
@@ -1025,4 +1028,22 @@ div#cont.head-hide {
     text-transform: uppercase;
     margin-top: -60px;
 }
-#newstatustext{}
+.roster-footer{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 220px;
+    overflow: hidden;
+}
+.roster-footer > div{padding: 10px;}
+.to-profile{
+    float: left;
+}
+.to-logout{
+    float: right;
+}
+select{font-size: 17px;padding: 2px;}
+.profile-footer{
+    
+}
+.profile-footer a{color: #ffffff;background-color: #3f5170;padding: 5px 13px;/* display: block; */margin: 4px 0;border-radius: 3px;}
