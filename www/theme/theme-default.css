@@ -242,7 +242,6 @@ ul {
 .message-form .messageinput {
     font-size: 16px;
     outline-width: 0;
-    background-color: white;
     font-family: inherit;
     resize: none;
     position: absolute;
@@ -252,6 +251,7 @@ ul {
     padding: 7px;
     display: block;
     width: 80%;
+    background-color: transparent;
 }
 
 .message-form .send {position: absolute;bottom: 0;right: 0;padding: 8px 10px;font-size: 19px;color: #3d5070;}

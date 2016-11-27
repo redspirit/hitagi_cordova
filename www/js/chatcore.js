@@ -763,25 +763,12 @@ function clickSendmess() {
     } else {
         ch.sendMessage(t, currentRoom, curColor);
     }
-    curRoomSel('.messageinput').val('').css('backgroundColor', 'white');
+    curRoomSel('.messageinput').val('');
     correctLatMess = false;
 }
 function keyInputmess(event) {
     if (event.keyCode == 13) { // enter
         clickSendmess();
-        return false;
-    }
-    if (event.keyCode == 38) { // up
-        mhist.cur = $(this).val();
-        $(this).val(mhist.old).css('backgroundColor', '#FCDEDC');
-        //$('#miw').css('backgroundColor','#FCDEDC');
-        correctLatMess = true;
-        return false;
-    }
-    if (event.keyCode == 40) { // down
-        $(this).val(mhist.cur).css('backgroundColor', 'white');
-        //$('#miw').css('backgroundColor','white');
-        correctLatMess = false;
         return false;
     }
 }
@@ -1276,12 +1263,6 @@ function messageAfterProc(s) {
 
                 if (/\.(jpg|jpeg|gif|png)\??.*$/i.test(link)) { // image
                     return tpl('image', {url1: link, url2: link});
-                } else if (testStr(link, 'htt(p|ps)://(www.)?youtube.com/')) { 	// youtube
-                    var yt = link.match(/v=([a-zA-Z0-9_-]+)/);
-                    return '<iframe width="560" height="315" src="http://www.youtube.com/embed/' + yt[1] + '" frameborder="0" allowfullscreen></iframe><a class="close_video" href="#">[X]</a>';
-                } else if (testStr(link, 'htt(p|ps)://coub.com/view/')) { 	// coub
-                    var coubId = link.match(/view\/([a-zA-Z0-9_-]+)/)[1];
-                    return '<iframe src="//coub.com/embed/' + coubId + '?muted=false&autostart=false&originalSize=false&startWithHD=false" allowfullscreen="true" frameborder="0" width="640" height="264"></iframe><a class="close_video" href="#">[X]</a>';
                 } else {	// simple link
                     return '<a href="' + link + '" target="_blank">' + link + '</a>';
                 }
