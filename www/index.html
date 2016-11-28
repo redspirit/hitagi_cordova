@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <meta name="format-detection" content="telephone=no">
 
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;subset=cyrillic" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="theme/font-awesome.min.css"/>
     <link rel="stylesheet" type="text/css" href="theme/begin.css"/>
     <link rel="stylesheet" type="text/css" href="theme/theme-default.css"/>
@@ -25,9 +26,9 @@
     <script type="text/javascript" src="http://vk.me/js/api/openapi.js?1"></script>
     <script type="text/javascript">
         var VKAPIID = 4147366;
-        var currentRoom = 'public';
-        //var currentRoom = 'lets_play';
-        var ch = hitagiCreate('ws://chat.aniavatars.com', true);
+        var SERVERURL = 'ws://chat.aniavatars.com';
+        //var currentRoom = 'public';
+        var currentRoom = 'lets_play';
     </script>
     <script type="text/javascript" src="js/chatcore.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
@@ -78,12 +79,12 @@
         <ul id="chat-tabs">
             <li id="add-room-tab"><img src="img/plus.png" title="Открыть комнату" alt=""></li>
         </ul>
-        <ul id="chat-toolbar">
+        <!--<ul id="chat-toolbar">-->
             <!--<li id="statusBtn" title="Изменить статусный текст"></li>-->
             <!--<li id="colorsBtn" title="Цвет сообщения"></li>-->
             <!--<li id="soundBtn" title="Включить / выключить звук"></li>-->
             <!--<li id="notifBtn" title="Включить / выключить оповещения"></li>-->
-        </ul>
+        <!--</ul>-->
         <div class="menu-button fa fa-bars"></div>
         <div id="chat-rooms" class="rooms"></div>
 

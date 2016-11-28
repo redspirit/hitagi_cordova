@@ -2170,7 +2170,7 @@ module.exports = function(opts) {
   // http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx
   var xscheme = opts.xscheme;
 
-  // XDomainRequest has a flow of not sending cookie, therefore it should be disabled as a default.
+  // XDomainRequest has a flow of not sending storage, therefore it should be disabled as a default.
   // https://github.com/Automattic/engine.io-client/pull/217
   var enablesXDR = opts.enablesXDR;
 

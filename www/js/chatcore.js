@@ -1,13 +1,14 @@
 var states = [], statesT = [], privas = [], privasT = [], umItems = [];
 var blockOverlay = true, clickOnProf = 0, currentType = 'room';
-var soundEnable, notifEnable, playSound, imaga, blockHide = true;
+var soundEnable, playSound, imaga, blockHide = true;
 var imageReader = new FileReader();
 var user, rooms = {}, vkmid, curColor, isFocus = true, startRoomLoads = 0;
-var isNotif, curState, reciveMessCount = 50, hisoryLimit = 50;
+var curState, reciveMessCount = 50, hisoryLimit = 50;
 var mhist = {cur: '', old: ''}, correctLatMess = false;
 var titleDefault = 'Аниме чат Hitagi';
 var imagesUrl = 'http://chat.aniavatars.com';
 var blurTimers = {};
+var ch = hitagiCreate(SERVERURL, true);
 
 /********** START APPLICATION ************/
 
@@ -16,7 +17,7 @@ function start() {
     createElements();
     bindings();
     initToolButtons();
-};
+}
 
 function createElements() {
     // создаем меню со статусами
@@ -26,6 +27,8 @@ function createElements() {
 }
 
 document.addEventListener("deviceready", function(){
+
+
 
     cordova.plugins.backgroundMode.setDefaults({
         title:  "Hitagi chat",
@@ -43,11 +46,15 @@ document.addEventListener("deviceready", function(){
         console.log("backgroundMode onfailure", errorCode);
     };
 
-    cordova.plugins.notification.local.on("click", function (notification) {
-        if (notification.id == 10) {
-            console.log('OKKOKOKOKOK', notification.data);
-        }
-    });
+    setTimeout(function () {
+
+        cordova.plugins.backgroundMode.setDefaults({
+            title:  "Hitagi chat",
+            ticker: "Hitagi работает в фоне",
+            text:   "Нажмите, чтобы открыть приложение"
+        });
+
+    }, 2000);
 
 }, false);
 
@@ -79,20 +86,12 @@ document.addEventListener("deviceready", function(){
 playSound = function () {};
 
 function initToolButtons() {
-    isNotif = "Notification" in window;
-    if (cookie("sounds") == 'off') {
+    if (storage("sounds") == 'off') {
         soundEnable = false;
         $('#soundBtn').removeClass('fa-bell').addClass('fa-bell-slash');
     } else {
         soundEnable = true;
         $('#soundBtn').removeClass('fa-bell-slash').addClass('fa-bell');
-    }
-    if (cookie("notifs") == 'on') {
-        notifEnable = true;
-        $('#notifBtn').css('backgroundImage', 'url(img/notifon.png)');
-    } else {
-        notifEnable = false;
-        $('#notifBtn').css('backgroundImage', 'url(img/notifoff.png)');
     }
 }
 
@@ -156,15 +155,20 @@ function bindings() {
 
 ch.response.onConnect = function () {
 
-    $('.reconnection-panel').hide();
+    loadTemplates(function(){
 
-    if (ch.autoLogin()) {
-        //hideForm()
-    } else {
-        $('#cont').addClass('loaded');
-        $('.is-loading').hide();
-        showAuthWindow();
-    }
+        start();
+
+        $('.reconnection-panel').hide();
+        if (ch.autoLogin()) {
+            //hideForm()
+        } else {
+            $('#cont').addClass('loaded');
+            $('.is-loading').hide();
+            showAuthWindow();
+        }
+
+    });
 
 };
 ch.response.onDisconnect = function () {
@@ -190,7 +194,7 @@ ch.response.onLogin = function (err, u) {
         hideForm();
 
         /*
-         var cookr = cookie('rooms');
+         var cookr = storage('rooms');
          if(cookr==null){
          ch.joinRoom(currentRoom, reciveMessCount);
          } else {
@@ -490,7 +494,7 @@ ch.response.onPM = function (err, d) {
 
                 addMessage(d);
             } else {
-                showDesktopNotif('Личное сообщение от ' + d.nick, d.text, 'img/notificon.png');
+                showNotifMessage('Личное сообщение от ' + d.nick, d.text, 'img/notificon.png');
                 ch.getMessages(d.room, 30);
             }
 
@@ -548,11 +552,11 @@ $('.usmenu').live('click', function () {
 $('.umenucont').live('mouseleave', function () {
     $(this).hide();
 });
-$('dd span.label').live('click', function () {
+$('dda span.label').live('click', function () {
     if (user.nick != $(this).text()) {
         var inp = curRoomSel('.messageinput');
-        var text = inp.val() + $(this).text() + ': ';
-        inp.focus().val('').val(text);
+        var text = inp.val() + $(this).text() + ' ';
+        inp.focus().val(text);
     }
 });
 $('#smWrap img').live('click', function () {
@@ -607,7 +611,6 @@ $('#chat-tabs a.label').live('click', function () {
     if (e.button == 2) {
         var roomName = $(this).attr('mid');
         var capt = rooms[roomName].caption;
-        ;
         var link = prompt('Ссылка на эту комнату', '[room=' + roomName + ']' + capt + '[/room]');
         if (link == null) link = '';
         var rsl = curRoomSel('.messageinput');
@@ -776,43 +779,15 @@ function clickSoundbtn() {
     if (soundEnable) {
         soundEnable = false;
         $(this).removeClass('fa-bell').addClass('fa-bell-slash');
-        cookie("sounds", 'off', {expires: 99});
+        storage("sounds", 'off');
     } else {
         soundEnable = true;
         $(this).removeClass('fa-bell-slash').addClass('fa-bell');
-        cookie("sounds", 'on', {expires: 99});
+        storage("sounds", 'on');
     }
 }
 function clickNotifbtn() {
 
-    if (!isNotif)
-        return showForm(tpl('nonotif'), 'Уведомления');
-
-    if (Notification.permission === "granted") {
-
-        if (notifEnable) {
-            notifEnable = false;
-            $('#notifBtn').css('backgroundImage', 'url(img/notifoff.png)');
-            cookie("notifs", 'off', {expires: 99});
-        } else {
-            notifEnable = true;
-            $('#notifBtn').css('backgroundImage', 'url(img/notifon.png)');
-            cookie("notifs", 'on', {expires: 99});
-        }
-
-    } else {
-
-        Notification.requestPermission(function (permission) {
-            if (permission === "granted") {
-                notifEnable = true;
-                $('#notifBtn').css('backgroundImage', 'url(img/notifon.png)');
-                cookie("notifs", 'on', {expires: 99});
-            } else {
-                alert('Вы заблокировали отображение уведомлений для чата в этом браузере');
-            }
-        });
-
-    }
 
 }
 function nickClick() {
@@ -917,8 +892,14 @@ function scrollPane() {
     var roomName = rid.split('-')[1];
     rooms[roomName].autoScroll = (this.offsetHeight + this.scrollTop >= this.scrollHeight);
 };
-function showForm(s, capt, top) {
-    $('#alert').html('<div class="close-form"><img title="Закрыть" src="img/close-form.png" alt="" /></div><h1>' + capt + '</h1> ' + s).css('top', top).show();
+function showForm(s, capt, addClass) {
+    var elem = $('#alert');
+    elem.html('<div class="close-form"><img title="Закрыть" src="img/close-form.png" alt="" /></div><h1>' + capt + '</h1> ' + s);
+    if(addClass)
+        elem.addClass(addClass);
+    else
+        elem.removeAttr('class');
+    elem.show();
     $('#overlay').show();
 }
 function hideForm() {
@@ -948,7 +929,7 @@ function allRoomsLoaded() {
 
     // когда все комнаты загрузились
 
-    var cookr = cookie('rooms');
+    var cookr = storage('rooms');
     if (cookr != null) {
         var rms = cookr.split('|');
         delete rms[rms.length];
@@ -1154,7 +1135,7 @@ function getUserItemHTML(name, nick, avaurl, status, priv, state, awstatus, pm) 
             st: status,
             states: states[state],
             statest: statesT[state],
-            awstatus: awayStatuses[awstatus],
+            awstatus: awayStatuses[awstatus]
         });
     }
 }
@@ -1189,21 +1170,24 @@ function saveTabs() {
     for (var i = 0; i < pan.length; i++) {
         roomtabs += $(pan[i]).attr('mid') + '|';
     }
-    cookie("rooms", roomtabs + currentRoom, {expires: 99});
+    storage("rooms", roomtabs + currentRoom);
 }
-function showDesktopNotif(capt, mes, userpic) {
+function showNotifMessage(capt, mes, userpic) {
 
-    // if (!(isNotif && notifEnable && mes) || isFocus)
-    //     return;
+    if(!soundEnable)
+        return false;
 
-    if(!cordova)
+    if(typeof cordova == 'undefined')
+        return false;
+
+    if(!cordova.plugins.backgroundMode.isActive())
         return false;
 
     cordova.plugins.notification.local.schedule({
         id: 10,
         title: capt,
         text: strip_tags(stripBB(mes)),
-        icon: userpic
+        icon: imagesUrl + userpic
     });
 
 }
@@ -1224,7 +1208,7 @@ function privGrid(a, b) {
 /********** AUTHENTICATION AND REGISTRATION ************/
 
 function showAuthWindow() {
-    showForm(tpl('auth'), 'Авторизация');
+    showForm(tpl('auth'), 'Авторизация', 'reg-alert');
     $('#auth_but').click(function () {
         ch.login($('#auth_login').val(), $('#auth_pass').val());
     });
@@ -1288,11 +1272,10 @@ function messageAfterProc(s) {
         if (s.text.match(user.nick + ':')) {
             s.text = '<span class="for-you">' + s.text + '</span>';
             playSound('foryou', true);
-            showDesktopNotif('Вам написал ' + usernick, s.text, userpic);
+            showNotifMessage('Вам написал ' + usernick, s.text, userpic);
         } else {
             if (s.user != user.login) {
                 var place = s.pm ? 'ЛС' : rooms[s.room].caption;
-                showDesktopNotif(usernick + ' в ' + place, s.text, userpic);
                 playSound('message');
             }
         }

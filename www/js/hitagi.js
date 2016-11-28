@@ -3,7 +3,7 @@ function hitagiCreate(socketUrl, loging){
 	var socket = io.connect(socketUrl);
 	var log_enable = loging;
     var isHardClode = false;
-	var cookTime = 90; // login cookie = 90 days
+	var cookTime = 90; // login storage = 90 days
 	var cookName = 'chatauth';
 	var chat = {};
 	var user = {'online':false};
@@ -69,7 +69,7 @@ function hitagiCreate(socketUrl, loging){
 			user.statustext = pr.statustext;
 			user.type = 'normal';
 			sendResponse('onLogin', false, user);
-			cookie(cookName, "norm;"+user.login+";"+user.pass, {expires:cookTime});
+			storage(cookName, "norm;"+user.login+";"+user.pass);
 		} else {
 			user.online = false;
 			if(pr.reason=='userblocked'){
@@ -97,7 +97,7 @@ function hitagiCreate(socketUrl, loging){
                 user.statustext = pr.statustext;
                 user.type = 'vk';
                 sendResponse('onLogin', false, user);
-                cookie(cookName, "vk;"+user.vkuid+";"+user.vkhash, {expires:cookTime});
+                storage(cookName, "vk;"+user.vkuid+";"+user.vkhash);
             }
         } else {
             user.online = false;
@@ -201,7 +201,7 @@ function hitagiCreate(socketUrl, loging){
     socket.on('logout', function (pr) {
         if(pr.status=='ok'){
             user = {online:false};
-            cookie(cookName, '');
+            storage(cookName, '');
             sendResponse('onLogout', false);
         } else {
             sendResponse('onLogout', true, pr.reason);
@@ -410,7 +410,7 @@ function hitagiCreate(socketUrl, loging){
 	};
 	chat.autoLogin = function(isMobile){
 		if(!isset(isMobile)) isMobile = false;
-		var coo = cookie(cookName);
+		var coo = storage(cookName);
 		if(!coo) return false;
 		var cha = coo.split(';');
 		if(cha[0]=='vk'){
@@ -570,6 +570,11 @@ a,x[i+10],23,-1094730640),a=hh(a,b,c,d,x[i+13],4,681279174),d=hh(d,a,b,c,x[i+0],
 function str2blks_MD5(f){nblk=(f.length+8>>6)+1;blks=Array(16*nblk);for(i=0;i<16*nblk;i++)blks[i]=0;for(i=0;i<f.length;i++)blks[i>>2]|=f.charCodeAt(i)<<8*(i%4);blks[i>>2]|=128<<8*(i%4);blks[16*nblk-2]=8*f.length;return blks}function add(f,k){var h=(f&65535)+(k&65535);return(f>>16)+(k>>16)+(h>>16)<<16|h&65535}function rol(f,k){return f<<k|f>>>32-k}function cmn(f,k,h,e,g,l){return add(rol(add(add(k,f),add(e,l)),g),h)}function ff(f,k,h,e,g,l,m){return cmn(k&h|~k&e,f,k,g,l,m)}
 function gg(f,k,h,e,g,l,m){return cmn(k&e|h&~e,f,k,g,l,m)}function hh(f,k,h,e,g,l,m){return cmn(k^h^e,f,k,g,l,m)}function ii(f,k,h,e,g,l,m){return cmn(h^(k|~e),f,k,g,l,m)}var hex_chr="0123456789abcdef";function rhex(f){str="";for(j=0;3>=j;j++)str+=hex_chr.charAt(f>>8*j+4&15)+hex_chr.charAt(f>>8*j&15);return str}
 var isset = function(vr){return typeof(vr)!=='undefined'};
-var cookie=function(d,c,a){if("undefined"!=typeof c){a=a||{};null===c&&(c="",a.expires=-1);var b="";if(a.expires&&("number"==typeof a.expires||a.expires.toUTCString))"number"==typeof a.expires?(b=new Date,b.setTime(b.getTime()+864E5*a.expires)):b=a.expires,b="; expires="+b.toUTCString();var e=a.path?"; path="+a.path:"",f=a.domain?"; domain="+a.domain:"",a=a.secure?"; secure":"";document.cookie=[d,"=",encodeURIComponent(c),b,e,f,a].join("")}else{c=null;if(document.cookie&&""!=document.cookie){a=document.cookie.split(";");
-for(b=0;b<a.length;b++)if(e=trim(a[b]),e.substring(0,d.length+1)==d+"="){c=decodeURIComponent(e.substring(d.length+1));break}}return c}};
 function trim(b,a){return ltrim(rtrim(b,a),a)}function ltrim(b,a){return b.replace(new RegExp("^["+(a||"\\s")+"]+","g"),"")}function rtrim(b,a){return b.replace(new RegExp("["+(a||"\\s")+"]+$","g"),"")};
+var storage = function(name, val){
+    if(typeof val == 'undefined') {
+        return localStorage.getItem(name);
+    } else {
+        localStorage.setItem(name, val);
+    }
+};

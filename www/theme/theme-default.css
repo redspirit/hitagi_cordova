@@ -1,7 +1,7 @@
 html, body {
     margin: 0;
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 table {
@@ -186,6 +186,11 @@ ul {
 
 .roster-pane {
     width: 220px;
+    position: absolute;
+    top: 32px;
+    bottom: 40px;
+    right: 0;
+    overflow: scroll;
 }
 
 .roster-pane .user {
@@ -755,7 +760,7 @@ div.clear {
 }
 
 #chat-tabs li a {
-    padding: 6px 50px 4px 10px;
+    padding: 6px 20px 4px 10px;
     display: inline-block;
     color: #666;
     height: 19px;
@@ -769,8 +774,6 @@ div.clear {
     background: -o-linear-gradient(top, #deefff 0%, #98bede 100%);
     background: -ms-linear-gradient(top, #deefff 0%, #98bede 100%);
     background: linear-gradient(to bottom, #deefff 0%, #98bede 100%);
-    border: 1px solid rgb(115, 143, 167);
-    border-bottom: none;
 }
 
 #chat-tabs a.active {
@@ -780,13 +783,7 @@ div.clear {
 
 #chat-tabs a:hover {
     color: white;
-    background: #f1e767;
-    background: -moz-linear-gradient(top, #f1e767 0%, #feb645 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f1e767), color-stop(100%, #feb645));
-    background: -webkit-linear-gradient(top, #f1e767 0%, #feb645 100%);
-    background: -o-linear-gradient(top, #f1e767 0%, #feb645 100%);
-    background: -ms-linear-gradient(top, #f1e767 0%, #feb645 100%);
-    background: linear-gradient(to bottom, #f1e767 0%, #feb645 100%);
+    background-color: #feb645;
 }
 
 #chat-tabs li:hover img {
@@ -875,18 +872,6 @@ div#cont.head-hide {
     padding: 3px 8px;
     border-radius: 10px;
     display: inline-block;
-}
-
-.for-you:before {
-    content: '';
-    border-color: transparent rgb(204, 237, 250) transparent transparent;
-    border-style: solid;
-    border-width: 6px 12px;
-    width: 0;
-    height: 0;
-    margin-left: -30px;
-    margin-top: 5px;
-    position: absolute;
 }
 
 .sk-folding-cube {
@@ -1014,7 +999,7 @@ div#cont.head-hide {
     bottom: -33px;
     width: 220px;
     margin: 30px 0 32px 0;
-    background-color: #f0f0f0;
+    background-image: url(../img/bg2.png);
     border-left: 1px solid #C5C5C5;
     z-index: 999;
     box-shadow: -2px 0px 26px 0px rgba(0,0,0,0.75);
@@ -1047,3 +1032,34 @@ select{font-size: 17px;padding: 2px;}
     
 }
 .profile-footer a{color: #ffffff;background-color: #3f5170;padding: 5px 13px;/* display: block; */margin: 4px 0;border-radius: 3px;}
+#alert.reg-alert{
+    top: 0;
+    bottom: 0;
+    z-index: 999;
+    color: #fff;
+    background-image: url("../img/auth-background.png");
+    background-size: cover;
+}
+#alert.reg-alert h1{display: none}
+#alert.reg-alert .rights a{
+    color: #fff;
+}
+#alert.reg-alert input{
+    border:0;
+    display:inline-block;
+    vertical-align:middle;
+    white-space:normal;
+    background-color: #fff;
+    line-height:1;
+    padding: 6px 10px;
+    color: #2e2e2e;
+    border-radius: 4px;
+}
+.app-icon > span{font-size: 50px;font-weight: bold;}
+.btn-white{background-color: #fff;padding: 9px 34px;border-radius: 3px;color: #373737;font-size: 15px;text-transform: uppercase;display: inline-block;}
+
+a#auth_but {}
+
+input:focus {
+    outline:0;
+}

@@ -121,12 +121,3 @@ var loadTemplates = function (callback) {
 
 };
 
-loadTemplates(start);
-
-
-// показать ростер - fa-users
-// fa-bell / fa-bell-slash
-// TODO - переделать cookie на локалсторадж
-// fa-sign-out - разлогиниться
-// fa-address-card-o - ссылка на окно редктирования профиля
-// там будет две кнопки на установку ника и аватаркитбьо
