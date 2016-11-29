@@ -17,6 +17,7 @@ function start() {
     createElements();
     bindings();
     initToolButtons();
+    initSounds();
 }
 
 function createElements() {
@@ -29,70 +30,80 @@ function createElements() {
 document.addEventListener("deviceready", function(){
 
 
-
     cordova.plugins.backgroundMode.setDefaults({
         title:  "Hitagi chat",
         ticker: "Hitagi работает в фоне",
-        text:   "Нажмите, чтобы открыть приложение"
+        text:   "Нажмите, чтобы открыть окно чата",
+        icon: 'icon',
+        color: "#ff00ff"
     });
     cordova.plugins.backgroundMode.enable();
     cordova.plugins.backgroundMode.onactivate = function () {
-        console.log("backgroundMode onactivate");
+
+        isFocus = false;
+
+        blurTimers.level1 = setTimeout(function () {
+            ch.awayStatus(1);
+        }, 60 * 1000); //1 min
+        blurTimers.level2 = setTimeout(function () {
+            ch.awayStatus(2)
+        }, 5 * 60 * 1000); //10 min
+        blurTimers.level3 = setTimeout(function () {
+            ch.awayStatus(3)
+        }, 30 * 60 * 1000); //30 min
+        blurTimers.level4 = setTimeout(function () {
+            ch.awayStatus(4)
+        }, 60 * 60 * 1000); //60 min
+
     };
     cordova.plugins.backgroundMode.ondeactivate = function () {
-        console.log("backgroundMode ondeactivate");
+
+        isFocus = true;
+        curRoomSel('.messageinput').focus();
+        setTitle(0);
+        if (rooms[currentRoom])
+            rooms[currentRoom]._newMessages = 0;
+        clearTimeout(blurTimers.level1);
+        clearTimeout(blurTimers.level2);
+        clearTimeout(blurTimers.level3);
+        clearTimeout(blurTimers.level4);
+        ch.awayStatus(0)
+
     };
-    cordova.plugins.backgroundMode.onfailure  = function (errorCode) {
-        console.log("backgroundMode onfailure", errorCode);
-    };
-
-    setTimeout(function () {
-
-        cordova.plugins.backgroundMode.setDefaults({
-            title:  "Hitagi chat",
-            ticker: "Hitagi работает в фоне",
-            text:   "Нажмите, чтобы открыть приложение"
-        });
-
-    }, 2000);
 
 }, false);
 
-// function initSounds() {
-//     // инициализируем звуки
-//
-//     var sounds = {};
-//
-//     sounds.message = new Howl({
-//         urls: ['sounds/in.mp3', 'sounds/in.ogg']
-//     });
-//     sounds.notif = new Howl({
-//         urls: ['sounds/out.mp3', 'sounds/out.ogg']
-//     });
-//     sounds.foryou = new Howl({
-//         urls: ['sounds/foryou.mp3', 'sounds/foryou.ogg']
-//     });
-//
-//     playSound = function (s, p) {
-//         if (isset(p)) {
-//             if (p) sounds[s].play();
-//         } else {
-//             if (soundEnable)
-//                 sounds[s].play();
-//         }
-//     }
-// }
+function initSounds() {
+    // инициализируем звуки
 
-playSound = function () {};
+    if(typeof Media == "undefined") {
+        playSound = function(){};
+        return false;
+    }
+
+    var sounds = {};
+    sounds.personal = new Media('/android_asset/www/sounds/personal.mp3');
+    sounds.message = new Media('/android_asset/www/sounds/message.mp3');
+
+    playSound = function (name) {
+        sounds[name].play();
+    }
+}
 
 function initToolButtons() {
-    if (storage("sounds") == 'off') {
-        soundEnable = false;
-        $('#soundBtn').removeClass('fa-bell').addClass('fa-bell-slash');
-    } else {
-        soundEnable = true;
-        $('#soundBtn').removeClass('fa-bell-slash').addClass('fa-bell');
-    }
+
+    setTimeout(function () {
+
+        if (storage("sounds") == 'off') {
+            soundEnable = false;
+            $('#soundBtn').removeClass('fa-bell').addClass('fa-bell-slash');
+        } else {
+            soundEnable = true;
+            $('#soundBtn').removeClass('fa-bell-slash').addClass('fa-bell');
+        }
+
+    }, 1000);
+
 }
 
 function bindings() {
@@ -113,47 +124,18 @@ function bindings() {
         $('#overlay').show();
     });
     $('.smiletabs div').click(clickSmiletab);
-    $(window).focus(function () {
-        isFocus = true;
-        curRoomSel('.messageinput').focus();
-        setTitle(0);
-        if (rooms[currentRoom])
-            rooms[currentRoom]._newMessages = 0;
-        clearTimeout(blurTimers.level1);
-        clearTimeout(blurTimers.level2);
-        clearTimeout(blurTimers.level3);
-        clearTimeout(blurTimers.level4);
-        ch.awayStatus(0)
-    }).blur(function () {
-        isFocus = false;
 
-        blurTimers.level1 = setTimeout(function () {
-            ch.awayStatus(1);
-        }, 60 * 1000); //1 min
-        blurTimers.level2 = setTimeout(function () {
-            ch.awayStatus(2)
-        }, 5 * 60 * 1000); //10 min
-        blurTimers.level3 = setTimeout(function () {
-            ch.awayStatus(3)
-        }, 30 * 60 * 1000); //30 min
-        blurTimers.level4 = setTimeout(function () {
-            ch.awayStatus(4)
-        }, 60 * 60 * 1000); //60 min
-
-    });
     for (var i in smiles[1]) {
         $('#smWrap').append('<img num="' + smiles[1][i] + '" src="' + imagesUrl + '/img/smiles/' + smiles[1][i] + '.gif" alt="" />');
     }
-
-    $(window).bind("beforeunload", function () {
-        saveTabs();
-    })
 
 }
 
 /********** SERVER CALLBACKS ************/
 
 ch.response.onConnect = function () {
+
+    $('.send').removeClass('disconnected');
 
     loadTemplates(function(){
 
@@ -172,14 +154,13 @@ ch.response.onConnect = function () {
 
 };
 ch.response.onDisconnect = function () {
-    $('.reconnection-panel').show();
-    $('#reconnecting-trying').text(0);
+    $('.send').addClass('disconnected');
 };
 ch.response.onReconnecting = function (err, num) {
-    $('#reconnecting-trying').text(num);
+    // показывает попытки реконнекта
 };
 ch.response.onReconnect = function (err, num) {
-    $('.reconnection-panel').hide();
+    $('.send').removeClass('disconnected');
 };
 ch.response.onLogin = function (err, u) {
     if (!err) {
@@ -644,6 +625,14 @@ $('.more-history').live('click', function () {
     var skip = curRoomSel('.mp dd span.label').length;
     ch.getHistory(rid.split('-')[1], skip, hisoryLimit);
 });
+
+
+var oldHeight = $(window).height();
+$(window).resize(function() {
+    if($(window).height() < oldHeight)
+        toBottom();
+});
+
 $(document).on('click', '.to-back', function () {
     $('.main-menu').hide();
     $('#chat-toolbar').hide();
@@ -766,7 +755,7 @@ function clickSendmess() {
     } else {
         ch.sendMessage(t, currentRoom, curColor);
     }
-    curRoomSel('.messageinput').val('');
+    curRoomSel('.messageinput').val('').focus();
     correctLatMess = false;
 }
 function keyInputmess(event) {
@@ -1087,12 +1076,10 @@ function addMessageHist(m) {
 }
 function addNotif(room, mes, color, silens) {
     roomSel(room, '.mp').append('<dt>' + date('H:i', time()) + '</dt><dd class="notif" style="color:' + color + '">' + mes + '</dd>');
-    if (silens != true) playSound('notif');
     toBottom();
 }
 function addNotifInRooms(user, mes, color) {
     $('.rp table[user=' + user + ']').parents('.room-pane').find('.mp').append('<dt>' + date('H:i', time()) + '</dt><dd class="notif" style="color:' + color + '">' + mes + '</dd>');
-    playSound('notif');
     toBottom();
 }
 function addTopic(mes, room) {
@@ -1164,18 +1151,7 @@ function fillUsers(usr) {
     $('div.profnick').click(nickClick);
     $('.user[user=' + user.login + '] .usmenu').hide();
 }
-function saveTabs() {
-    var roomtabs = '';
-    var pan = document.querySelectorAll('#chat-tabs a.label');
-    for (var i = 0; i < pan.length; i++) {
-        roomtabs += $(pan[i]).attr('mid') + '|';
-    }
-    storage("rooms", roomtabs + currentRoom);
-}
 function showNotifMessage(capt, mes, userpic) {
-
-    if(!soundEnable)
-        return false;
 
     if(typeof cordova == 'undefined')
         return false;
@@ -1240,7 +1216,7 @@ function messageAfterProc(s) {
         var uplRegexp = /^uploadimage\|([a-z0-9_:.\/]+)\|([a-z0-9_:.\/]+)$/i;
         if (uplRegexp.test(s.text)) {
             s.text.replace(uplRegexp, function (a, b, c) {
-                s.text = tpl('image', {url1: c, url2: b});
+                s.text = tpl('image', {url1: imagesUrl + c, url2: imagesUrl + b});
             });
         } else {
             s.text = s.text.replace(new RegExp('(https?://)([-a-zA-Zа-яА-Я0-9@:;%!_\+.,~#?&//=/(/)]+)', 'gi'), function (link) {
@@ -1271,12 +1247,13 @@ function messageAfterProc(s) {
 
         if (s.text.match(user.nick + ':')) {
             s.text = '<span class="for-you">' + s.text + '</span>';
-            playSound('foryou', true);
+            //playSound('personal', true);
             showNotifMessage('Вам написал ' + usernick, s.text, userpic);
         } else {
             if (s.user != user.login) {
                 var place = s.pm ? 'ЛС' : rooms[s.room].caption;
-                playSound('message');
+                if(soundEnable)
+                    playSound('message');
             }
         }
 

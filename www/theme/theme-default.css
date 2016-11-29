@@ -259,7 +259,18 @@ ul {
     background-color: transparent;
 }
 
-.message-form .send {position: absolute;bottom: 0;right: 0;padding: 8px 10px;font-size: 19px;color: #3d5070;}
+.message-form .send {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 8px 10px;
+    font-size: 19px;
+    color: #0956d7;
+}
+.message-form .send.disconnected {
+    color: #c9c9c9;
+}
+
 .message-pane dt {
     color: #888;
     font-size: 12px;
@@ -831,6 +842,9 @@ img.image-close {
 div.pic-block {
     display: inline-block;
 }
+div.pic-block > a{
+    text-decoration: none;
+}
 
 div.more-history {
     padding: 6px;
@@ -1062,4 +1076,13 @@ a#auth_but {}
 
 input:focus {
     outline:0;
+}
+.reconnection-spinner{
+    position: absolute;
+    top:40px;
+    right: 3px;
+    font-size: 20px;
+    color: #3C3C3C;
+    z-index: 15;
+    display: none;
 }
