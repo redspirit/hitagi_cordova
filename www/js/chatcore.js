@@ -5,15 +5,31 @@ var imageReader = new FileReader();
 var user, rooms = {}, vkmid, curColor, isFocus = true, startRoomLoads = 0;
 var curState, reciveMessCount = 50, hisoryLimit = 50;
 var mhist = {cur: '', old: ''}, correctLatMess = false;
+var blurTimers = {};
 var titleDefault = 'Аниме чат Hitagi';
 var imagesUrl = 'http://chat.aniavatars.com';
-var blurTimers = {};
-var ch = hitagiCreate(SERVERURL, true);
+var ch = hitagiCreate('ws://chat.aniavatars.com', true);
+var debouncer = new JoinDebouncer(5);
+var authLock = new Auth0Lock(
+    'oHTGcfXKEWjBACwwgAm5bga9Qe92XJLA',
+    'redspirit.eu.auth0.com',
+    {
+        //allowedConnections: ['vk', 'google'],
+        languageDictionary: languageDictionary,
+        //language: 'ru',
+        theme: {
+            primaryColor: 'blue'
+        },
+        auth: {
+            popup: true,
+            redirect: false
+        }
+    }
+);
 
 /********** START APPLICATION ************/
 
 function start() {
-    VK.init({apiId: VKAPIID});
     createElements();
     bindings();
     initToolButtons();
@@ -29,6 +45,7 @@ function createElements() {
 
 document.addEventListener("deviceready", function(){
 
+    /* ********************** */
 
     cordova.plugins.backgroundMode.setDefaults({
         title:  "Hitagi chat",
@@ -167,30 +184,12 @@ ch.response.onLogin = function (err, u) {
         user = u;
         curColor = u.textcolor;
 
-        $('#chat-tabs li.litab').remove();
+        //$('#chat-tabs li.litab').remove();
         $('#chat-rooms').html('');
         
         helloStr(u.nick);
         blockOverlay = false;
         hideForm();
-
-        /*
-         var cookr = storage('rooms');
-         if(cookr==null){
-         ch.joinRoom(currentRoom, reciveMessCount);
-         } else {
-         var rms = cookr.split('|');
-         if(rms.length>1){
-         for(var i=0; i<rms.length-1; i++){
-         console.log('----', rms[i]);
-         ch.joinRoom(rms[i], reciveMessCount);
-         startRoomLoads++;
-         }
-         } else {
-         ch.joinRoom(currentRoom, reciveMessCount);
-         }
-         }
-         */
 
         ch.joinRoom(currentRoom, reciveMessCount);
 
@@ -213,43 +212,42 @@ ch.response.onLogout = function (err, data) {
     blockOverlay = true;
 };
 ch.response.onJoinRoom = function (err, d, d2) {
-    if (!err) {
 
-        $('#chat-tabs a.label').removeClass('active');
-        $('#add-room-tab').before(tpl('roomtab', {name: d.name, capt: d.caption}))
-        $('#chat-rooms').append(tpl('roompane', {name: d.name, type: 'room'}));
-        $('.room-pane').hide();
-        $('#room-' + d.name).show().find('.mpw').scroll(scrollPane);
-
-        currentRoom = d.name;
-        currentType = 'room';
-
-        hideForm();
-        clearUsers();
-        fillUsers(d.users);
-
-        startRoomLoads--;
-        if (startRoomLoads == 0) {
-            allRoomsLoaded();
-        }
-
-        rooms[currentRoom].autoScroll = true;
-        rooms[currentRoom].tp = 'room';
-
-    } else if (err == 'banned') {
+    if (err == 'banned') {
         curRoomSel('.rp').html('');
         curRoomSel('mp').html(tpl('banmes', {time: Math.ceil(d / 60), reason: ''}));
-    } else {
-        if (d == 'alreadyinroom') {
-            alert('Вы уже находитесь в этой комнате');
-        } else {
-            showNotificator('Ошибка захода в комнату: ' + d, 2000);
-        }
+        return false;
     }
+
+    if(err)
+        return false;
+
+    $('#chat-tabs a.label').removeClass('active');
+    $('#add-room-tab').before(tpl('roomtab', {name: d.name, capt: d.caption}));
+    $('#chat-rooms').append(tpl('roompane', {name: d.name, type: 'room'}));
+    $('.room-pane').hide();
+    $('#room-' + d.name).show().find('.mpw').scroll(scrollPane);
+
+    currentRoom = d.name;
+    currentType = 'room';
+
+    hideForm();
+    clearUsers();
+    fillUsers(d.users);
+
+    startRoomLoads--;
+    if (startRoomLoads == 0) {
+        allRoomsLoaded();
+    }
+
+    rooms[currentRoom].autoScroll = true;
+    rooms[currentRoom].tp = 'room';
+
 };
 ch.response.onAfterRoomJoin = function (err, d) {
     addTopic(d.topic, d.room);
-    if (d.newmes > 0) addNotif(d.room, 'C момента ухода в комнате появилось <b>' + d.newmes + '</b> новых сообщений', '#0F9B14', true);
+    if (d.newmes > 0)
+        addNotif(d.room, 'C момента ухода в комнате появилось <b>' + d.newmes + '</b> новых сообщений', '#0F9B14', true);
     $('#cont').addClass('loaded');
     $('.is-loading').hide();
 };
@@ -307,6 +305,11 @@ ch.response.onSetNick = function (err, d) {
     }
 };
 ch.response.onUserJoined = function (err, d) {
+
+    var isStopped = debouncer.stop(d.user);
+    if(isStopped)
+        return false;
+
     addUser(d.room, d.user, d.info);
 
     if (d.info.already)
@@ -316,9 +319,12 @@ ch.response.onUserJoined = function (err, d) {
 
 };
 ch.response.onUserLeaved = function (err, d) {
+    debouncer.start(d.user, d);
+};
+debouncer.onFinish(function(userLogin, d){
     addNotif(d.room, '<b>' + d.nick + '</b> покинул комнату', '#E70343');
     delUser(d.room, d.user);
-};
+});
 ch.response.onGetProfile = function (err, d) {
     if (!err) {
         if (clickOnProf == 1)
@@ -487,6 +493,7 @@ ch.response.onPM = function (err, d) {
     }
 };
 
+
 /********** LIVE CLICKS ************/
 
 $('.send').live('click', clickSendmess);
@@ -621,11 +628,10 @@ $('#chat-tabs .pmtab img.close').live('click', function () {
 });
 $('.more-history').live('click', function () {
     // получаем историю
-    var rid = $(this).parents('.room-pane').attr('id')
-    var skip = curRoomSel('.mp dd span.label').length;
+    var rid = $(this).parents('.room-pane').attr('id');
+    var skip = curRoomSel('.msg dda span.label').length;
     ch.getHistory(rid.split('-')[1], skip, hisoryLimit);
 });
-
 
 var oldHeight = $(window).height();
 $(window).resize(function() {
@@ -644,6 +650,28 @@ $(document).on('click', '#soundBtn', clickSoundbtn);
 $(document).on('click', '.to-logout', clickLogout);
 $(document).on('click', '.to-profile', clickProfile);
 $(document).on('click', '.change-avatar', clickSetava);
+
+$(document).on('click', '.btn-login', function(e) {
+
+    console.log('Do login');
+
+    authLock.show(function(err, profile, token) {
+        if (err) {
+            // Error callback
+            console.log("There was an error");
+            alert("There was an error logging in");
+        } else {
+            // Success calback
+
+            console.log('TOKEN', token);
+            console.log('PROFILE', profile);
+
+        }
+    });
+
+    return false;
+
+});
 
 /********** INTERFACE EVENTS ************/
 function clickLogout() {
@@ -1037,6 +1065,10 @@ function showMyProfileWindow(udat, vis) {
 function addMessage(m) {
     var mObj;
     var typ = m.pm ? 'pm' : 'room';
+
+    if( $('.message-pane [id=' + m.mid +']').length )
+        return false;
+
     if (!isset(m.mid)) m.mid = '';
     if (m.text == '' || !isset(m.text)) return false;
     if (!isset(m.date)) m.date = time();
@@ -1188,11 +1220,6 @@ function showAuthWindow() {
     $('#auth_but').click(function () {
         ch.login($('#auth_login').val(), $('#auth_pass').val());
     });
-
-    setTimeout(function () {
-        VK.Widgets.Auth("vk_auth", {width: "200px", onAuth: VKauthProc});
-    }, 500);
-
 }
 function VKauthProc(data) {
     if (!data) {

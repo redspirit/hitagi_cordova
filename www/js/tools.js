@@ -1,4 +1,32 @@
 
+var JoinDebouncer = function (timeout) {
+
+	var self = this;
+	var _onFinish = function(){};
+	var timers = {};
+
+	self.start = function (name, data) {
+		self.stop(name);
+		timers[name] = setTimeout(function () {
+			_onFinish(name, data);
+			timers[name] = null;
+		}, timeout * 1000);
+	};
+	self.stop = function (name) {
+		if(timers[name]) {
+			clearTimeout(timers[name]);
+			return true;
+		} else {
+			return false;
+		}
+	};
+	self.onFinish = function (cb) {
+		_onFinish = cb;
+	}
+
+};
+
+
 function translite(str){
 	str = str.toLowerCase();
 	var arr={'а':'a', 'б':'b', 'в':'v', 'г':'g', 'д':'d', 'е':'e', 'ж':'g', 'з':'z', 'и':'i', 'й':'y', 'к':'k', 'л':'l', 'м':'m', 'н':'n', 'о':'o', 'п':'p', 'р':'r', 'с':'s', 'т':'t', 'у':'u', 'ф':'f', 'ы':'i', 'э':'e', 'ё':'yo', 'х':'h', 'ц':'ts', 'ч':'ch', 'ш':'sh', 'щ':'sch', 'ъ':'', 'ь':'', 'ю':'yu', 'я':'ya', ' ':'_'};
