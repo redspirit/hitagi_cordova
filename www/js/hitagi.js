@@ -3,11 +3,11 @@ function hitagiCreate(socketUrl, loging){
 	var socket = io.connect(socketUrl);
 	var log_enable = loging;
     var isHardClode = false;
-	var cookTime = 90; // login storage = 90 days
-	var cookName = 'chatauth';
+	var storageName = 'chatauth';
 	var chat = {};
 	var user = {'online':false};
 	var usersNick = {};
+    var platform = 'android-cordova';
 	
 	chat.response = {};
 
@@ -58,7 +58,7 @@ function hitagiCreate(socketUrl, loging){
         console.log("Информация о сервере:", data);
     });
 	socket.on('auth', function (pr) {
-		if(pr.status=='ok'){
+		if(pr.status == 'ok'){
 			user.online = true;
 			user.privilege = pr.privilege;
 			user.nick = pr.nickname;
@@ -69,39 +69,33 @@ function hitagiCreate(socketUrl, loging){
 			user.statustext = pr.statustext;
 			user.type = 'normal';
 			sendResponse('onLogin', false, user);
-			storage(cookName, "norm;"+user.login+";"+user.pass);
+			storage(storageName, "passwd;;" + user.login + ";;" + user.pass);
 		} else {
 			user.online = false;
-			if(pr.reason=='userblocked'){
+			if(pr.reason == 'userblocked'){
 				sendResponse('onLogin', 'blocked', pr.message);
 			} else {
 				sendResponse('onLogin', true, pr.reason);
 			}
 		}
 	});
-    socket.on('vkauth', function (pr) {
-        if(pr.status=='ok'){
-            if(pr.newreg){
-                // reg vk user - re enter
-                var ree = {'uid':user.vkuid, 'hash':user.vkhash, 'mobile':false, 'client':navigator.userAgent};
-                socket.emit('vkauth', ree);
-            } else {
-                // simple auth
-                user.online = true;
-                user.privilege = pr.privilege;
-                user.nick = pr.nickname;
-                user.login = pr.login;
-                user.state = pr.state;
-                user.avasrc = pr.url;
-                user.textcolor = pr.textcolor;
-                user.statustext = pr.statustext;
-                user.type = 'vk';
-                sendResponse('onLogin', false, user);
-                storage(cookName, "vk;"+user.vkuid+";"+user.vkhash);
-            }
+    socket.on('authsocial', function (pr) {
+        if(pr.status == 'ok'){
+            user.online = true;
+            user.privilege = pr.privilege;
+            user.nick = pr.nickname;
+            user.login = pr.login;
+            user.state = pr.state;
+            user.avasrc = pr.url;
+            user.textcolor = pr.textcolor;
+            user.statustext = pr.statustext;
+            user.linked = pr.linked;
+            user.socialType = pr.socialType;
+            sendResponse('onLogin', false, user);
+            storage(storageName, "social;;"+user.socialToken);
         } else {
             user.online = false;
-            if(pr.reason=='userblocked'){
+            if(pr.reason == 'userblocked'){
                 sendResponse('onLogin', 'blocked', pr.message);
             } else {
                 sendResponse('onLogin', true, pr.reason);
@@ -199,9 +193,11 @@ function hitagiCreate(socketUrl, loging){
         }
 	});
     socket.on('logout', function (pr) {
-        if(pr.status=='ok'){
-            user = {online:false};
-            storage(cookName, '');
+        if(pr.status == 'ok') {
+            user = {
+                online: false
+            };
+            storage(storageName, '');
             sendResponse('onLogout', false);
         } else {
             sendResponse('onLogout', true, pr.reason);
@@ -395,32 +391,36 @@ function hitagiCreate(socketUrl, loging){
 
 	/********     COMANDS     ********/
 	
-	chat.login = function(name, pass, isVK, isMobile){
-		if(!isset(isMobile)) isMobile = false;
-		if(!isset(isVK)) isVK = false;
-		if(isVK){
-			socket.emit('vkauth', {'uid':name, 'hash':pass.hash, 'name1':pass.name1, 'name2':pass.name2, 'mobile':isMobile, 'client':navigator.userAgent});
-			user.vkuid = name;
-			user.vkhash = pass.hash;
-		} else {
-			user.pass = md5(pass);
-            socket.emit('auth', {'login':name, 'pass':user.pass, 'mobile':isMobile, 'client':navigator.userAgent});
-		}
+	chat.login = function(name, pass){
+		var isMobile = true;
+        user.pass = md5(pass);
+        socket.emit('auth', {
+            login: name,
+            pass: user.pass,
+            platform: platform,
+            client: navigator.userAgent
+        });
 		return true;
 	};
-	chat.autoLogin = function(isMobile){
-		if(!isset(isMobile)) isMobile = false;
-		var coo = storage(cookName);
-		if(!coo) return false;
-		var cha = coo.split(';');
-		if(cha[0]=='vk'){
-            socket.emit('vkauth', {'uid':cha[1], 'hash':cha[2], 'mobile':isMobile, 'client':navigator.userAgent});
-			user.vkuid = cha[1]*1;
-			user.vkhash = cha[2];
+	chat.loginSocial = function(token){
+        socket.emit('authsocial', {
+            token: token,
+            platform: platform,
+            client: navigator.userAgent
+        });
+        user.socialToken = token;
+		return true;
+	};
+	chat.autoLogin = function(){
+		var authData = storage(storageName);
+		if(!authData)
+		    return false;
+		var cha = authData.split(';;');
+		if(cha[0] == 'passwd'){
+            chat.login(cha[1], cha[2]);
 			return true;
-		} else if(cha[0]=='norm') {
-            socket.emit('auth', {'login':cha[1], 'pass':cha[2], 'mobile':isMobile, 'client':navigator.userAgent});
-			user.pass = cha[2];
+		} else if(cha[0]=='social') {
+            chat.loginSocial(cha[1]);
 			return true;
 		} else {
 			return false;

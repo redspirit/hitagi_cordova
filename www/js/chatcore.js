@@ -2,7 +2,7 @@ var states = [], statesT = [], privas = [], privasT = [], umItems = [];
 var blockOverlay = true, clickOnProf = 0, currentType = 'room';
 var soundEnable, playSound, imaga, blockHide = true;
 var imageReader = new FileReader();
-var user, rooms = {}, vkmid, curColor, isFocus = true, startRoomLoads = 0;
+var user, rooms = {}, curColor, isFocus = true, startRoomLoads = 0;
 var curState, reciveMessCount = 50, hisoryLimit = 50;
 var mhist = {cur: '', old: ''}, correctLatMess = false;
 var blurTimers = {};
@@ -14,18 +14,27 @@ var authLock = new Auth0Lock(
     'oHTGcfXKEWjBACwwgAm5bga9Qe92XJLA',
     'redspirit.eu.auth0.com',
     {
-        //allowedConnections: ['vk', 'google'],
+        allowedConnections: ['vkontakte', 'google-oauth2'],
         languageDictionary: languageDictionary,
-        //language: 'ru',
         theme: {
-            primaryColor: 'blue'
+            primaryColor: '#0081cc',
+            logo: 'img/appicon.png'
         },
         auth: {
             popup: true,
             redirect: false
-        }
+        },
+        autoclose: true,
+        initialScreen: 'login'
     }
 );
+
+
+authLock.on("authenticated", function(authResult) {
+
+    ch.loginSocial(authResult.idToken);
+
+});
 
 /********** START APPLICATION ************/
 
@@ -44,8 +53,6 @@ function createElements() {
 }
 
 document.addEventListener("deviceready", function(){
-
-    /* ********************** */
 
     cordova.plugins.backgroundMode.setDefaults({
         title:  "Hitagi chat",
@@ -250,19 +257,6 @@ ch.response.onAfterRoomJoin = function (err, d) {
         addNotif(d.room, 'C момента ухода в комнате появилось <b>' + d.newmes + '</b> новых сообщений', '#0F9B14', true);
     $('#cont').addClass('loaded');
     $('.is-loading').hide();
-};
-ch.response.onRegisterVK = function (err, data) {
-    if (!err) {
-        alert(tpl('vrnotif'));
-        showAuthWindow();
-    } else {
-        if (vkmid) {
-            showAuthWindow();
-            if (data == 'wrongauth') $('#reglink').trigger('click');
-        } else {
-            alert(data);
-        }
-    }
 };
 ch.response.onChat = function (err, d) {
     if (!err) {
@@ -651,26 +645,9 @@ $(document).on('click', '.to-logout', clickLogout);
 $(document).on('click', '.to-profile', clickProfile);
 $(document).on('click', '.change-avatar', clickSetava);
 
-$(document).on('click', '.btn-login', function(e) {
-
-    console.log('Do login');
-
-    authLock.show(function(err, profile, token) {
-        if (err) {
-            // Error callback
-            console.log("There was an error");
-            alert("There was an error logging in");
-        } else {
-            // Success calback
-
-            console.log('TOKEN', token);
-            console.log('PROFILE', profile);
-
-        }
-    });
-
+$(document).on('click', '#auth-social', function(e) {
+    authLock.show();
     return false;
-
 });
 
 /********** INTERFACE EVENTS ************/
@@ -1218,21 +1195,10 @@ function privGrid(a, b) {
 function showAuthWindow() {
     showForm(tpl('auth'), 'Авторизация', 'reg-alert');
     $('#auth_but').click(function () {
-        ch.login($('#auth_login').val(), $('#auth_pass').val());
+        var login = $('#auth_login').val();
+        var pass = $('#auth_pass').val();
+        ch.login(login, pass);
     });
-}
-function VKauthProc(data) {
-    if (!data) {
-        return alert('Что-то не так, нет ответа от ВК');
-    }
-    ch.login(data.uid, {
-        hash: data.hash,
-        name1: data.first_name,
-        name2: data.last_name
-    }, true);
-}
-function testStr(str, pat) {
-    return new RegExp(pat, 'i').test(str);
 }
 
 /********** MESSAGE AFTER RECIVE ************/

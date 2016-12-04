@@ -67,3 +67,20 @@ c&&21>c?"th":{1:"st",2:"nd",3:"rd"}[c%10]||"th"},w:function(){return d.getDay()}
 L:function(){return 1===(new Date(a.Y(),1,29)).getMonth()|0},o:function(){var c=a.n(),b=a.W();return a.Y()+(12===c&&9>b?-1:1===c&&9<b)},Y:function(){return d.getFullYear()},y:function(){return(a.Y()+"").slice(-2)},a:function(){return 11<d.getHours()?"pm":"am"},A:function(){return a.a().toUpperCase()},B:function(){var a=3600*d.getUTCHours(),b=60*d.getUTCMinutes(),f=d.getUTCSeconds();return e(Math.floor((a+b+f+3600)/86.4)%1E3,3)},g:function(){return a.G()%12||12},G:function(){return d.getHours()},h:function(){return e(a.g(),
 2)},H:function(){return e(a.G(),2)},i:function(){return e(d.getMinutes(),2)},s:function(){return e(d.getSeconds(),2)},u:function(){return e(1E3*d.getMilliseconds(),6)},e:function(){throw"Not supported (see source code of date() for timezone on how to add support)";},I:function(){var c=new Date(a.Y(),0),b=Date.UTC(a.Y(),0),d=new Date(a.Y(),6),e=Date.UTC(a.Y(),6);return 0+(c-b!==d-e)},O:function(){var a=d.getTimezoneOffset(),b=Math.abs(a);return(0<a?"-":"+")+e(100*Math.floor(b/60)+b%60,4)},P:function(){var c=
 a.O();return c.substr(0,3)+":"+c.substr(3,2)},T:function(){return"UTC"},Z:function(){return 60*-d.getTimezoneOffset()},c:function(){return"Y-m-d\\Th:i:sP".replace(g,f)},r:function(){return"D, d M Y H:i:s O".replace(g,f)},U:function(){return d.getTime()/1E3|0}};this.date=function(a,b){d="undefined"===typeof b?new Date:b instanceof Date?new Date(b):new Date(1E3*b);return a.replace(g,f)};return this.date(i,j)};
+
+var setStore = function (name, data) {
+	if(_.isObject(data)) {
+		localStorage.setItem(name, JSON.stringify(data) );
+	} else {
+		localStorage.setItem(name, data);
+	}
+};
+var getStore = function (name) {
+	var data = localStorage.getItem(name);
+	try {
+		var json = JSON.parse(data);
+		return json;
+	} catch (e) {
+		return data;
+	}
+};

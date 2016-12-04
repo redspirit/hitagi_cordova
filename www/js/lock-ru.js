@@ -95,7 +95,7 @@ var languageDictionary = {
   usernameFormatErrorHint: "Используйте %d-%d букв, цифр и \"_\"",
   usernameInputPlaceholder: "Ваше имя пользователя",
   useranmeOrEmailInputPlaceholder: "электронной почты/пользователя", // TODO review
-  title: "Auth0",
+  title: "Hitagi Chat Login",
   welcome: "Добро пожаловать, %s!",
   windowsAuthInstructions: "Вы подключены через корпоративную сеть&hellip;",
   windowsAuthLabel: "Аутентификация Windows"
