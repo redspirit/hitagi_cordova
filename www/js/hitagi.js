@@ -1,7 +1,6 @@
 
-function hitagiCreate(socketUrl, loging){
+function hitagiCreate(socketUrl, log_enable){
 	var socket = io.connect(socketUrl);
-	var log_enable = loging;
     var isHardClode = false;
 	var storageName = 'chatauth';
 	var chat = {};
@@ -391,9 +390,8 @@ function hitagiCreate(socketUrl, loging){
 
 	/********     COMANDS     ********/
 	
-	chat.login = function(name, pass){
-		var isMobile = true;
-        user.pass = md5(pass);
+	chat.login = function(name, pass, noHash){
+        user.pass = noHash ? pass : md5(pass);
         socket.emit('auth', {
             login: name,
             pass: user.pass,
@@ -417,7 +415,7 @@ function hitagiCreate(socketUrl, loging){
 		    return false;
 		var cha = authData.split(';;');
 		if(cha[0] == 'passwd'){
-            chat.login(cha[1], cha[2]);
+            chat.login(cha[1], cha[2], true);
 			return true;
 		} else if(cha[0]=='social') {
             chat.loginSocial(cha[1]);
@@ -502,7 +500,7 @@ function hitagiCreate(socketUrl, loging){
 	};
 	chat.setAvatar = function(file, cb){
 		// file is src data of image element;
-        $.post('/upload/avatar/' + socket.id, file).then(function(data){
+        $.post(imagesUrl + '/upload/avatar/' + socket.id, file).then(function(data){
             if(data.status == 'ok')
                 cb(data);
             else
@@ -511,9 +509,9 @@ function hitagiCreate(socketUrl, loging){
             cb(false);
         });
 	};
-	chat.uploadImage = function(file,cb){
+	chat.uploadImage = function(file, cb){
 		// file is src data of image element
-        $.post('/upload/image', file).then(function(data){
+        $.post(imagesUrl + '/upload/image', file).then(function(data){
             if(data.status == 'ok')
                 cb(data);
             else

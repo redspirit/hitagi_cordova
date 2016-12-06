@@ -191,8 +191,8 @@ ch.response.onLogin = function (err, u) {
         user = u;
         curColor = u.textcolor;
 
-        //$('#chat-tabs li.litab').remove();
-        $('#chat-rooms').html('');
+        $('#chat-tabs li.litab').remove();
+        //$('#chat-rooms').html('');
         
         helloStr(u.nick);
         blockOverlay = false;
@@ -209,7 +209,7 @@ ch.response.onLogin = function (err, u) {
             alert('Неверный логин или пароль');
             showAuthWindow();
         }
-        if (u == 'wronghash') {
+        if (u == 'code_401') {
             showAuthWindow();
         }
     }
@@ -252,6 +252,11 @@ ch.response.onJoinRoom = function (err, d, d2) {
 
 };
 ch.response.onAfterRoomJoin = function (err, d) {
+
+    // костыль для затирания пустых сообщений после реконнекта
+    $('dd.bot:empty, dd.topic:empty').remove();
+    $('.notif:empty').prev().remove();
+
     addTopic(d.topic, d.room);
     if (d.newmes > 0)
         addNotif(d.room, 'C момента ухода в комнате появилось <b>' + d.newmes + '</b> новых сообщений', '#0F9B14', true);
@@ -341,9 +346,9 @@ ch.response.onSetProfile = function (err, d) {
 ch.response.onSetAvatar = function (err, d) {
 
     if (d.user == user.login)
-        $('#newavaimg').attr('src', d.url);
+        $('#newavaimg').attr('src', imagesUrl + d.url);
 
-    roomSel('', '.rp table[user=' + d.user + '] .profava').attr('src', d.url);
+    roomSel('', '.rp table[user=' + d.user + '] .profava').attr('src', imagesUrl + d.url);
     hideForm();
     addNotifInRooms(d.user, '<b>' + d.nick + '</b> обновил аватарку', '#0F419B');
 
@@ -992,7 +997,6 @@ function uplAvatar(file) {
                         $('#avalabel').html('Ошибка загрузки');
                         return showNotificator('Ошибка установки аватарки: ' + result.reason, 3000);
                     }
-
                 });
             }
         }
@@ -1021,20 +1025,16 @@ function showMyProfileWindow(udat, vis) {
         $('#pr_birthday').val(date('m/d/Y', udat['birthday']));
     }
     $('#pr_vis').val(vis);
-    $('#pr_birthday').simpleDatepicker({chosendate: '01/01/1995', startdate: '01/01/1970', enddate: '01/01/2005'});
+    //$('#pr_birthday').simpleDatepicker({chosendate: '01/01/1995', startdate: '01/01/1970', enddate: '01/01/2005'});
     $('#prof_save').click(function () {
         var dat = {};
         if ($('#pr_gender').val() != '') dat['gender'] = $('#pr_gender').val();
-        if ($('#pr_birthday').val() != '') dat['birthday'] = parseDT($('#pr_birthday').val());
+        // if ($('#pr_birthday').val() != '') dat['birthday'] = parseDT($('#pr_birthday').val());
         if ($('#pr_realname').val() != '') dat['realname'] = $('#pr_realname').val();
         if ($('#pr_country').val() != '') dat['country'] = $('#pr_country').val();
         if ($('#pr_email').val() != '') dat['email'] = $('#pr_email').val();
         if ($('#pr_homepage').val() != '') dat['homepage'] = $('#pr_homepage').val();
         if ($('#pr_phone').val() != '') dat['phone'] = $('#pr_phone').val();
-        if ($('#pr_icq').val() != '') dat['icq'] = $('#pr_icq').val();
-        if ($('#pr_skype').val() != '') dat['skype'] = $('#pr_skype').val();
-        if ($('#pr_twitter').val() != '') dat['twitter'] = $('#pr_twitter').val();
-        if ($('#pr_facebook').val() != '') dat['facebook'] = $('#pr_facebook').val();
         if ($('#pr_vk').val() != '') dat['vk'] = $('#pr_vk').val();
         ch.setProfile(user.login, dat, $('#pr_vis').val());
     });

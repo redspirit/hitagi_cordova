@@ -1041,11 +1041,22 @@ div#cont.head-hide {
 .to-logout{
     float: right;
 }
-select{font-size: 17px;padding: 2px;}
+select{
+    font-size: 17px;
+    padding: 2px;
+    background-color: #fff;
+}
 .profile-footer{
     
 }
-.profile-footer a{color: #ffffff;background-color: #3f5170;padding: 5px 13px;/* display: block; */margin: 4px 0;border-radius: 3px;}
+.profile-footer a{
+    color: #ffffff;
+    background-color: #3f5170;
+    padding: 5px 13px;
+    display: block;
+    margin: 4px 0;
+    border-radius: 3px;
+}
 #alert.reg-alert{
     top: 0;
     bottom: 0;
