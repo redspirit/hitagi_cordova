@@ -1,7 +1,6 @@
 var states = [], statesT = [], privas = [], privasT = [], umItems = [];
 var blockOverlay = true, clickOnProf = 0, currentType = 'room';
 var soundEnable, playSound, imaga, blockHide = true;
-var imageReader = new FileReader();
 var user, rooms = {}, curColor, isFocus = true, startRoomLoads = 0;
 var curState, reciveMessCount = 50, hisoryLimit = 50;
 var mhist = {cur: '', old: ''}, correctLatMess = false;
@@ -9,6 +8,7 @@ var blurTimers = {};
 var titleDefault = 'Аниме чат Hitagi';
 var imagesUrl = 'http://chat.aniavatars.com';
 var ch = hitagiCreate('ws://chat.aniavatars.com', true);
+var uploadImageFileElement;
 var debouncer = new JoinDebouncer(5);
 var authLock = new Auth0Lock(
     'oHTGcfXKEWjBACwwgAm5bga9Qe92XJLA',
@@ -153,6 +153,11 @@ function bindings() {
         $('#smWrap').append('<img num="' + smiles[1][i] + '" src="' + imagesUrl + '/img/smiles/' + smiles[1][i] + '.gif" alt="" />');
     }
 
+    uploadImageFileElement = document.getElementById('input-image-file');
+    uploadImageFileElement.onchange = function () {
+        uploadImage(this.files[0]);
+    };
+
 }
 
 /********** SERVER CALLBACKS ************/
@@ -192,7 +197,7 @@ ch.response.onLogin = function (err, u) {
         curColor = u.textcolor;
 
         $('#chat-tabs li.litab').remove();
-        //$('#chat-rooms').html('');
+        $('#chat-rooms').html('');
         
         helloStr(u.nick);
         blockOverlay = false;
@@ -252,10 +257,6 @@ ch.response.onJoinRoom = function (err, d, d2) {
 
 };
 ch.response.onAfterRoomJoin = function (err, d) {
-
-    // костыль для затирания пустых сообщений после реконнекта
-    $('dd.bot:empty, dd.topic:empty').remove();
-    $('.notif:empty').prev().remove();
 
     addTopic(d.topic, d.room);
     if (d.newmes > 0)
@@ -495,8 +496,9 @@ ch.response.onPM = function (err, d) {
 
 /********** LIVE CLICKS ************/
 
-$('.send').live('click', clickSendmess);
-$('.messageinput').live('keydown', keyInputmess);
+$('.send-text').live('click', clickSendmess);
+$('.send-file').live('click', clickSendImage);
+$('.messageinput').live('keydown', keyInputmessDown).live('keyup', keyInputmessUp);
 $('.image-close').live('click', function () {
     $(this).parents('span').html('<span class="deletedmes">Картинка скрыта</span>');
 });
@@ -768,12 +770,25 @@ function clickSendmess() {
     curRoomSel('.messageinput').val('').focus();
     correctLatMess = false;
 }
-function keyInputmess(event) {
+function clickSendImage() {
+    $('#input-image-file').click();
+}
+function keyInputmessDown(event) {
     if (event.keyCode == 13) { // enter
         clickSendmess();
         return false;
     }
 }
+function keyInputmessUp(event) {
+    if($(this).val()) {
+        $('.send-text').show();
+        $('.send-file').hide();
+    } else {
+        $('.send-text').hide();
+        $('.send-file').show();
+    }
+}
+
 function clickSoundbtn() {
     if (soundEnable) {
         soundEnable = false;
@@ -986,7 +1001,9 @@ function setCurrentTab(name) {
     toBottom();
 }
 function uplAvatar(file) {
-    if (!file.type.match(/image.*/)) return true;
+    if (!file.type.match(/image.*/))
+        return true;
+    var imageReader = new FileReader();
     imageReader.onload = (function (aFile) {
         return function (e) {
             imaga = document.createElement('img');
@@ -1003,6 +1020,38 @@ function uplAvatar(file) {
     })(file);
     imageReader.readAsDataURL(file);
 }
+function uploadImage(file) {
+    if (!file.type.match(/image.*/))
+        return false;
+    blockInputWhenLoading(true);
+    var imageReader = new FileReader();
+    imageReader.onload = (function (aFile) {
+        return function (e) {
+            imaga = document.createElement('img');
+            imaga.src = e.target.result;
+            imaga.onload = function () {
+                ch.uploadImage(imaga.src, function (result) {
+                    blockInputWhenLoading(false);
+                    if (!result)
+                        return showNotificator('Ошибка загрузки: ' + result.reason, 3000);
+                    ch.chat('uploadimage|'+result.urlImage+'|'+result.urlThumb, currentRoom, curColor);
+                });
+            }
+        }
+    })(file);
+    imageReader.readAsDataURL(file);
+
+}
+function blockInputWhenLoading(state){
+    if(state) {
+        $('.messageinput').prop("disabled", true).attr('placeholder', 'Загрузка картинки...');
+        $('.send-file').removeClass('fa-paperclip').addClass('fa-spinner fa-spin');
+    } else {
+        $('.messageinput').prop("disabled", false).attr('placeholder', 'Сообщение...');
+        $('.send-file').removeClass('fa-spinner fa-spin').addClass('fa-paperclip');
+    }
+}
+
 function helloStr(nick) {
     $('#hello').html(tpl('hello', {n: nick}));
 }
@@ -1042,9 +1091,6 @@ function showMyProfileWindow(udat, vis) {
 function addMessage(m) {
     var mObj;
     var typ = m.pm ? 'pm' : 'room';
-
-    if( $('.message-pane [id=' + m.mid +']').length )
-        return false;
 
     if (!isset(m.mid)) m.mid = '';
     if (m.text == '' || !isset(m.text)) return false;
