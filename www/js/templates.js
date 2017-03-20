@@ -97,7 +97,8 @@ var templatesNames = [
     'useritempm',
     'userprof',
     'vrnotif',
-    'roompane'
+    'roompane',
+    'changetheme'
 ];
 
 var loadTemplates = function (callback) {

@@ -50,6 +50,7 @@ function createElements() {
     for (var i = 0; i < statesT.length; ++i) {
         $('#tmenu').append(tpl('statusitem', {s1: states[i], s2: statesT[i], n: i}));
     }
+    designThemeUpdate(null);
 }
 
 document.addEventListener("deviceready", function(){
@@ -648,9 +649,11 @@ $(document).on('click', '.to-back', function () {
 $(document).on('click', '#stateBtn', clickStatebtn);
 $(document).on('click', '#statusBtn', clickStatusbtn);
 $(document).on('click', '#soundBtn', clickSoundbtn);
+$(document).on('click', '#selectTheme', clickSelectTheme);
 $(document).on('click', '.to-logout', clickLogout);
 $(document).on('click', '.to-profile', clickProfile);
 $(document).on('click', '.change-avatar', clickSetava);
+$(document).on('click', '.theme-link-item', clickThemeItem);
 
 $(document).on('click', '#auth-social', function(e) {
     authLock.show();
@@ -701,15 +704,14 @@ function clickStatusbtn() {
         ch.setStatus($('#newstatustext').val());
     });
 }
-function clickDesignItem() {
-    var act = $(this).attr('act');
-    if (act == 'theme-default') {
-        designThemeUpdate('theme-default');
-    }
-    if (act == 'theme-dark') {
-        designThemeUpdate('theme-dark');
-    }
 
+function designThemeUpdate(name) {
+    if(name) {
+        localStorage.setItem('designTheme', name);
+    } else {
+        name = localStorage.getItem('designTheme') || 'default';
+    }
+    $('.my-styles').attr('href', 'theme/theme-' + name + '.css');
 }
 
 function clickModerBut() {
@@ -804,6 +806,17 @@ function clickNotifbtn() {
 
 
 }
+function clickSelectTheme() {
+    $('.main-menu').hide();
+    showForm(tpl('changetheme'), 'Выбор темы оформления');
+}
+function clickThemeItem() {
+    var theme = $(this).attr('data-theme');
+    hideForm();
+    designThemeUpdate(theme);
+    return false;
+}
+
 function nickClick() {
     $('.main-menu').hide();
     var cluser = $(this).parents('.user').attr('user');

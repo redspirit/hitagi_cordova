@@ -68,8 +68,8 @@ function hitagiCreate(socketUrl, log_enable){
 			user.statustext = pr.statustext;
 			user.type = 'normal';
 			sendResponse('onLogin', false, user);
-			storage(storageName, "passwd;;" + user.login + ";;" + user.pass);
-		} else {
+            storage(storageName, "passwd;;" + user.enteredLogin + ";;" + user.pass);
+        } else {
 			user.online = false;
 			if(pr.reason == 'userblocked'){
 				sendResponse('onLogin', 'blocked', pr.message);
@@ -392,6 +392,7 @@ function hitagiCreate(socketUrl, log_enable){
 	
 	chat.login = function(name, pass, noHash){
         user.pass = noHash ? pass : md5(pass);
+        user.enteredLogin = name;
         socket.emit('auth', {
             login: name,
             pass: user.pass,
