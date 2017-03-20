@@ -81,7 +81,7 @@ td {
     bottom: 0;
     right: 0;
     left: 0;
-    color: #6e6e6e;
+    color: #a3a3a3;
     overflow: hidden;
     display: none;
 }
@@ -223,7 +223,7 @@ ul {
     /*background: url(elka.gif) no-repeat 98% 99%, url(ngfon.png) repeat-x left bottom;
     background: url(ngfon.png) repeat-x left bottom;*/
     border-top: 1px solid #C5C5C5;
-    background-color: #0e0e0e;
+    background-color: #3d3d3d;
 }
 
 .message-pane {
@@ -274,7 +274,7 @@ ul {
 }
 
 .message-pane dt {
-    color: #888;
+    color: #a3a3a3;
     font-size: 12px;
     padding-top: 4px;
     display: block;
@@ -850,12 +850,11 @@ div.pic-block > a{
 
 div.more-history {
     padding: 6px;
-    background-color: rgb(234, 244, 255);;
+    background-color: rgb(26, 28, 31);
     cursor: pointer;
     text-align: center;
     font-size: 80%;
     font-weight: bold;
-    border-bottom: 1px solid rgb(52, 120, 165);
 }
 
 div.more-history:hover {
@@ -994,7 +993,7 @@ div#cont.head-hide {
 
 .awaystatus {
     margin-top: 5px;
-    color: #164870;
+    color: #728899;
     font-size: 11px;
 }
 
