@@ -1,6 +1,6 @@
 var states = [], statesT = [], privas = [], privasT = [], umItems = [];
 var blockOverlay = true, clickOnProf = 0, currentType = 'room';
-var soundEnable, playSound, imaga, blockHide = true;
+var soundEnable, playSound, blockHide = true;
 var user, rooms = {}, curColor, isFocus = true, startRoomLoads = 0;
 var curState, reciveMessCount = 50, hisoryLimit = 50;
 var mhist = {cur: '', old: ''}, correctLatMess = false;
@@ -8,7 +8,7 @@ var blurTimers = {};
 var titleDefault = 'Аниме чат Hitagi';
 var imagesUrl = 'http://chat.aniavatars.com';
 var ch = hitagiCreate('ws://chat.aniavatars.com', true);
-var uploadImageFileElement;
+//var ch = hitagiCreate('ws://localhost:8091', true);
 var debouncer = new JoinDebouncer(5);
 var authLock = new Auth0Lock(
     'oHTGcfXKEWjBACwwgAm5bga9Qe92XJLA',
@@ -154,11 +154,6 @@ function bindings() {
         $('#smWrap').append('<img num="' + smiles[1][i] + '" src="' + imagesUrl + '/img/smiles/' + smiles[1][i] + '.gif" alt="" />');
     }
 
-    uploadImageFileElement = document.getElementById('input-image-file');
-    uploadImageFileElement.onchange = function () {
-        uploadImage(this.files[0]);
-    };
-
 }
 
 /********** SERVER CALLBACKS ************/
@@ -206,18 +201,25 @@ ch.response.onLogin = function (err, u) {
 
         ch.joinRoom(currentRoom, reciveMessCount);
 
-    } else if (err == 'blocked') {
+    } else if(err == 'another') {
+        $('.replace-connect-panel').show();
         curRoomSel('.rp').html('');
-        curRoomSel('.mp').html(tpl('blockmes', {mess: u}));
+        curRoomSel('.mp').html('');
+    } else if(err == 'blocked'){
+        curRoomSel('.rp').html('');
+        curRoomSel('.mp').html(tpl('blockmes', {mess:u}));
     } else {
-        if (u == 'alreadyauth') alert('Под этой учетной записью уже авторизованы');
-        if (u == 'wrongauth') {
-            alert('Неверный логин или пароль');
-            showAuthWindow();
+        if(u == 'alreadyauth')
+            return alert('Под этой учетной записью уже авторизованы');
+
+        if(u == 'wrongauth'){
+            return alert('Неверный логин или пароль');
         }
-        if (u == 'code_401') {
-            showAuthWindow();
-        }
+
+        showAuthWindow();
+        $('.is-loading').hide();
+        //alert('Ошибка авторизации: ' + u);
+
     }
 };
 ch.response.onLogout = function (err, data) {
@@ -258,7 +260,6 @@ ch.response.onJoinRoom = function (err, d, d2) {
 
 };
 ch.response.onAfterRoomJoin = function (err, d) {
-
     addTopic(d.topic, d.room);
     if (d.newmes > 0)
         addNotif(d.room, 'C момента ухода в комнате появилось <b>' + d.newmes + '</b> новых сообщений', '#0F9B14', true);
@@ -675,11 +676,23 @@ function clickProfile() {
 function clickSetava() {
     var form = tpl('setava', {src: imagesUrl + user.avasrc});
     showForm(form, 'Установка аватарки');
-    var ifile = document.getElementById('inputfile');
-    ifile.onchange = function () {
-        $('#avalabel').html('Загружается...');
-        uplAvatar(this.files[0]);
+    var ifile = document.getElementById('ava-select');
+    ifile.onclick = function () {
+
+        navigator.camera.getPicture(function(imageURI) {
+            var uri = "data:image/jpeg;base64," + imageURI;
+            uplAvatar(uri);
+            $('#avalabel').html('Загружается...');
+        }, function(message) {
+            console.log('CAMERA Failed because: ' + message);
+        }, {
+            quality: 60,
+            destinationType: 0, // DATA_URL
+            sourceType: 0       // Library
+        });
+
     };
+
     return false;
 }
 function mouseSmile1() {
@@ -714,26 +727,6 @@ function designThemeUpdate(name) {
     $('.my-styles').attr('href', 'theme/theme-' + name + '.css');
 }
 
-function clickModerBut() {
-    var m = $('#modmenu');
-    if (m.css('display') == 'none') {
-        if (blockHide) m.show();
-        blockHide = true;
-    } else {
-        m.hide();
-    }
-    if (m.html() == '') {
-        m.append(tpl('modmenu'));
-        m.show();
-        $('.moditem').click(function () {
-            var v = $(this).attr('val') * 1;
-            m.hide();
-            blockHide = false;
-            showModerWindow(v);
-        });
-    }
-
-}
 function clickRoomsbtn() {
     ch.getRoomslist();
 }
@@ -773,7 +766,18 @@ function clickSendmess() {
     correctLatMess = false;
 }
 function clickSendImage() {
-    $('#input-image-file').click();
+
+    navigator.camera.getPicture(function(imageURI) {
+        var uri = "data:image/jpeg;base64," + imageURI;
+        uploadImage(uri);
+    }, function(message) {
+        console.log('CAMERA Failed because: ' + message);
+    }, {
+        quality: 60,
+        destinationType: 0, // DATA_URL
+        sourceType: 0       // Library
+    });
+
 }
 function keyInputmessDown(event) {
     if (event.keyCode == 13) { // enter
@@ -1013,46 +1017,26 @@ function setCurrentTab(name) {
     $('.pic-block').css('height', 'auto');
     toBottom();
 }
-function uplAvatar(file) {
-    if (!file.type.match(/image.*/))
-        return true;
-    var imageReader = new FileReader();
-    imageReader.onload = (function (aFile) {
-        return function (e) {
-            imaga = document.createElement('img');
-            imaga.src = e.target.result;
-            imaga.onload = function () {
-                ch.setAvatar(imaga.src, function (result) {
-                    if (!result) {
-                        $('#avalabel').html('Ошибка загрузки');
-                        return showNotificator('Ошибка установки аватарки: ' + result.reason, 3000);
-                    }
-                });
-            }
+function uplAvatar(data) {
+
+    ch.setAvatar(data, function (result) {
+        if (!result) {
+            $('#avalabel').html('Ошибка загрузки');
+            return showNotificator('Ошибка установки аватарки: ' + result.reason, 3000);
         }
-    })(file);
-    imageReader.readAsDataURL(file);
+    });
+
 }
-function uploadImage(file) {
-    if (!file.type.match(/image.*/))
-        return false;
+function uploadImage(data) {
+
     blockInputWhenLoading(true);
-    var imageReader = new FileReader();
-    imageReader.onload = (function (aFile) {
-        return function (e) {
-            imaga = document.createElement('img');
-            imaga.src = e.target.result;
-            imaga.onload = function () {
-                ch.uploadImage(imaga.src, function (result) {
-                    blockInputWhenLoading(false);
-                    if (!result)
-                        return showNotificator('Ошибка загрузки: ' + result.reason, 3000);
-                    ch.chat('uploadimage|'+result.urlImage+'|'+result.urlThumb, currentRoom, curColor);
-                });
-            }
-        }
-    })(file);
-    imageReader.readAsDataURL(file);
+
+    ch.uploadImage(data, function (result) {
+        blockInputWhenLoading(false);
+        if (!result)
+            return showNotificator('Ошибка загрузки: ' + result.reason, 3000);
+        ch.chat('uploadimage|'+result.urlImage+'|'+result.urlThumb, currentRoom, curColor);
+    });
 
 }
 function blockInputWhenLoading(state){

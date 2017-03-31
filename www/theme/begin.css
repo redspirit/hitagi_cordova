@@ -16,17 +16,14 @@
 }
 
 .reconnection-panel .connect-info, .replace-connect-panel .connect-info{
-    position: absolute;
-    width: 500px;
-    box-sizing: border-box;
-    left: 50%;
-    margin-top: 200px;
-    margin-left: -250px;
-    background-color: #fff;
-    text-align: center;
-    padding: 20px;
-    font-size: 14px;
+    padding: 40px;
     z-index: 1000;
+    background-color: #dfdfdf;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100px;
+    text-align: center;
 }
 .bold{
     font-weight: bold;

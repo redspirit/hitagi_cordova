@@ -1,10 +1,10 @@
 
 function hitagiCreate(socketUrl, log_enable){
 	var socket = io.connect(socketUrl);
-    var isHardClode = false;
-	var storageName = 'chatauth';
+    var isHardClose = false;
+	var storageName = 'token';
 	var chat = {};
-	var user = {'online':false};
+	var user = {online: false};
 	var usersNick = {};
     var platform = 'android-cordova';
 	
@@ -35,13 +35,42 @@ function hitagiCreate(socketUrl, log_enable){
 		if(gp<=1) p = 1;
 		return p;
 	}
+
+    var loginProcess = function(pr){
+        if(pr.status == 'ok'){
+            user.online = true;
+            user.privilege = pr.privilege;
+            user.nick = pr.nickname;
+            user.login = pr.login;
+            user.token = pr.token;
+            user.avasrc = pr.url;
+            user.state = pr.state;
+            user.textcolor = pr.textcolor;
+            user.statustext = pr.statustext;
+            user.type = 'normal';
+            sendResponse('onLogin', false, user);
+            storage(storageName, user.token);
+        } else {
+            console.log('AUTH error', pr);
+            user.online = false;
+            if(pr.reason == 'anotherlogin') {
+                sendResponse('onLogin', 'another', '');
+                isHardClose = true;
+                socket.disconnect();
+            } else if(pr.reason == 'userblocked'){
+                sendResponse('onLogin', 'blocked', pr.message);
+            } else {
+                sendResponse('onLogin', true, pr.reason);
+            }
+        }
+    };
 	
 	
 	/********     RESPONSE     ********/
 
     socket.on('disconnect', function(){
         console.log("DISCONNECT");
-        if(isHardClode)
+        if(isHardClose)
             return;
         sendResponse('onDisconnect', false);
     });
@@ -53,54 +82,15 @@ function hitagiCreate(socketUrl, log_enable){
         console.log("reconnecting", num);
         sendResponse('onReconnecting', false, num);
     });
-    socket.on('getserverinfo', function(data){
-        console.log("Информация о сервере:", data);
+    socket.on('auth', function(data){
+        loginProcess(data);
     });
-	socket.on('auth', function (pr) {
-		if(pr.status == 'ok'){
-			user.online = true;
-			user.privilege = pr.privilege;
-			user.nick = pr.nickname;
-			user.login = pr.login;
-			user.avasrc = pr.url;
-			user.state = pr.state;
-			user.textcolor = pr.textcolor;
-			user.statustext = pr.statustext;
-			user.type = 'normal';
-			sendResponse('onLogin', false, user);
-            storage(storageName, "passwd;;" + user.enteredLogin + ";;" + user.pass);
-        } else {
-			user.online = false;
-			if(pr.reason == 'userblocked'){
-				sendResponse('onLogin', 'blocked', pr.message);
-			} else {
-				sendResponse('onLogin', true, pr.reason);
-			}
-		}
-	});
-    socket.on('authsocial', function (pr) {
-        if(pr.status == 'ok'){
-            user.online = true;
-            user.privilege = pr.privilege;
-            user.nick = pr.nickname;
-            user.login = pr.login;
-            user.state = pr.state;
-            user.avasrc = pr.url;
-            user.textcolor = pr.textcolor;
-            user.statustext = pr.statustext;
-            user.linked = pr.linked;
-            user.socialType = pr.socialType;
-            sendResponse('onLogin', false, user);
-            storage(storageName, "social;;"+user.socialToken);
-        } else {
-            user.online = false;
-            if(pr.reason == 'userblocked'){
-                sendResponse('onLogin', 'blocked', pr.message);
-            } else {
-                sendResponse('onLogin', true, pr.reason);
-            }
-        }
-	});
+    socket.on('login', function (pr) {
+        loginProcess(pr);
+    });
+    socket.on('loginsocial', function (pr) {
+        loginProcess(pr);
+    });
     socket.on('joinroom', function (pr) {
         if (pr.status != 'ok') {
             if (pr.status == 'banned') {
@@ -389,42 +379,39 @@ function hitagiCreate(socketUrl, log_enable){
 	});
 
 	/********     COMANDS     ********/
-	
-	chat.login = function(name, pass, noHash){
+
+    chat.login = function(name, pass, noHash){
+        isHardClose = false;
         user.pass = noHash ? pass : md5(pass);
-        user.enteredLogin = name;
-        socket.emit('auth', {
+        socket.emit('login', {
             login: name,
             pass: user.pass,
             platform: platform,
             client: navigator.userAgent
         });
-		return true;
-	};
-	chat.loginSocial = function(token){
-        socket.emit('authsocial', {
+        return true;
+    };
+    chat.loginSocial = function(token){
+        isHardClose = false;
+        socket.emit('loginsocial', {
             token: token,
             platform: platform,
             client: navigator.userAgent
         });
         user.socialToken = token;
-		return true;
-	};
-	chat.autoLogin = function(){
-		var authData = storage(storageName);
-		if(!authData)
-		    return false;
-		var cha = authData.split(';;');
-		if(cha[0] == 'passwd'){
-            chat.login(cha[1], cha[2], true);
-			return true;
-		} else if(cha[0]=='social') {
-            chat.loginSocial(cha[1]);
-			return true;
-		} else {
-			return false;
-		}
-	};
+        return true;
+    };
+    chat.autoLogin = function(){
+        var token = storage(storageName);
+        if(!token)
+            return false;
+        socket.emit('auth', {
+            token: token,
+            client: navigator.userAgent,
+            platform: platform
+        });
+        return true;
+    };
 	chat.logOut = function(){
         socket.emit('logout', {});
 		return true;

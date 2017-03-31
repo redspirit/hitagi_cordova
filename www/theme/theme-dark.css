@@ -616,7 +616,7 @@ dd.notif {
 dd.topic {
     text-align: center;
     font-weight: bold;
-    color: #F42;
+    color: #009dff;
     display: block;
     margin: 10px 0;
     padding: 0;
@@ -883,7 +883,7 @@ div#cont.head-hide {
 
 .for-you {
     font-weight: bold;
-    background-color: rgb(204, 237, 250);
+    background-color: rgb(18, 18, 18);
     padding: 3px 8px;
     border-radius: 10px;
     display: inline-block;
@@ -1099,4 +1099,7 @@ input:focus {
     color: #3C3C3C;
     z-index: 15;
     display: none;
+}
+dda span,.ustatus,.statetxt,dt{
+    color:#FFF6D7!important;
 }
