@@ -7,8 +7,9 @@ var mhist = {cur: '', old: ''}, correctLatMess = false;
 var blurTimers = {};
 var titleDefault = 'Аниме чат Hitagi';
 var imagesUrl = 'http://chat.aniavatars.com';
-var ch = hitagiCreate('ws://chat.aniavatars.com', true);
-//var ch = hitagiCreate('ws://localhost:8091', true);
+//var ch = hitagiCreate('ws://chat.aniavatars.com', true);
+var ch = hitagiCreate('ws://localhost:8091', true);
+var isDevice = document.URL.indexOf('http://') === -1 && document.URL.indexOf('https://') === -1;
 var debouncer = new JoinDebouncer(5);
 var authLock = new Auth0Lock(
     'oHTGcfXKEWjBACwwgAm5bga9Qe92XJLA',
@@ -37,6 +38,15 @@ authLock.on("authenticated", function(authResult) {
 });
 
 /********** START APPLICATION ************/
+
+(function(){
+
+    if(!isDevice)
+        window.AppVersion = {
+            version: 'web'
+        };
+})();
+
 
 function start() {
     createElements();
@@ -97,7 +107,6 @@ document.addEventListener("deviceready", function(){
     };
     
     $('.version-number').text(AppVersion.version);
-    console.log("App ver", AppVersion.version);
 
 }, false);
 
@@ -553,31 +562,42 @@ $('.umenucont').live('mouseleave', function () {
 
 $('.profava').live('click', function(){
 
-    var to = $(this).attr('nn') || $(this).text();
+    var to = $(this).attr('nn');
+    var toSrc = $(this).attr('src');
 
-    if(user.nick == to)
-        return false;
+    //if(user.nick == to)
+    //    return false;
 
     var inp = curRoomSel('.messageinput');
-    var labels = curRoomSel('.nick-labels-list');
+    var labels = curRoomSel('.message-form li.label-item');
+    var container = curRoomSel('.message-form');
 
     inp.focus();
 
     var arr = [];
-    labels.children().each(function(){
-        arr.push($(this).attr('data-nick'));
+    labels.each(function(){
+        arr.push($(this).find('img').attr('data-nick'));
     });
 
-    if(arr.indexOf(to) > -1)
+    if(arr.indexOf(to) > -1 || arr.length == 3) {
+        $('.main-menu').hide();
+        hideForm();
         return false;
+    }
 
-    var elem = $('<span class="nick-label"></span>');
-    elem.attr('title', 'Удалить').attr('data-nick', to).html(to);
-    labels.append(elem);
+    var elem = $('<li class="label-item"><img class="nick-icon" src="" alt=""></li>');
+    elem
+        .find('img')
+        .attr('src', toSrc)
+        .attr('data-nick', to);
+    container.prepend(elem);
     elem.click(function(){
         $(this).remove();
         inp.focus();
     });
+
+    $('.main-menu').hide();
+    hideForm();
 
 });
 
@@ -784,9 +804,9 @@ function clickSendmess(){
 
     mhist.old = t;
 
-    var labels = curRoomSel('.nick-labels-list');
-    labels.children().each(function(){
-        var label = $(this).attr('data-nick');
+    var labels = curRoomSel('.message-form li.label-item');
+    labels.each(function(){
+        var label = $(this).find('img').attr('data-nick');
         t = label + ': ' + t;
     });
 
@@ -794,11 +814,11 @@ function clickSendmess(){
 
         if(t == '!бутылка игнор') {
             storage("bottle-hide", true);
-            curRoomSel('.messageinput').val('').css('backgroundColor','white');
+            curRoomSel('.messageinput').val('');
             return showNotificator('Теперь вы не будете получать уведомления от бутылки', 3000);
         } else if (t == '!бутылка вернись') {
             storage("bottle-hide", false);
-            curRoomSel('.messageinput').val('').css('backgroundColor','white');
+            curRoomSel('.messageinput').val('');
             return showNotificator('Бутылка вернулась!', 3000);
         }
 
@@ -806,7 +826,7 @@ function clickSendmess(){
     } else {
         ch.sendMessage(t, currentRoom, curColor);
     }
-    curRoomSel('.messageinput').val('').css('backgroundColor','white');
+    curRoomSel('.messageinput').val('').css('backgroundColor','transparent');
     correctLatMess = false;
 }
 function clickSendImage() {
@@ -1280,7 +1300,7 @@ function privGrid(a, b) {
 /********** AUTHENTICATION AND REGISTRATION ************/
 
 function showAuthWindow() {
-    showForm(tpl('auth'), 'Авторизация', 'reg-alert');
+    showForm(tpl('auth', {version: AppVersion.version}), 'Авторизация', 'reg-alert');
     $('#auth_but').click(function () {
         var login = $('#auth_login').val();
         var pass = $('#auth_pass').val();
