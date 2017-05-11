@@ -1078,7 +1078,7 @@ function setCurrentTab(name) {
 
     tab.addClass('active').find('span').html('0').hide();
     currentRoom = name;
-    $('.pic-block').css('height', 'auto');
+    //$('.pic-block').css('height', 'auto');
     toBottom();
 }
 function uplAvatar(data) {

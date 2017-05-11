@@ -661,9 +661,8 @@ dd.topic {
 
 dd.bot {
     color: #3C3C3C;
-    font-family: Verdana;
     font-style: italic;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .btn {
