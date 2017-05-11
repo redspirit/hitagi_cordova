@@ -49,7 +49,7 @@ function hitagiCreate(socketUrl, log_enable){
             user.statustext = pr.statustext;
             user.type = 'normal';
             sendResponse('onLogin', false, user);
-            storage(storageName, user.token);
+            user.token && storage(storageName, user.token);
         } else {
             console.log('AUTH error', pr);
             user.online = false;
@@ -141,7 +141,8 @@ function hitagiCreate(socketUrl, log_enable){
 	});
     socket.on('userjoined', function (pr) {
         pr.data.commonPriv = getCommonPriv(pr.data.roomPriv, pr.data.globPriv);
-        rooms[pr.room]['users'][pr.name] = pr.data;
+        if(rooms[pr.room])
+            rooms[pr.room]['users'][pr.name] = pr.data;
         usersNick[pr.name] = pr.data.nick;
         sendResponse('onUserJoined', false, {room:pr.room, user:pr.name, info:pr.data});
     });

@@ -95,6 +95,9 @@ document.addEventListener("deviceready", function(){
         ch.awayStatus(0)
 
     };
+    
+    $('.version-number').text(AppVersion.version);
+    console.log("App ver", AppVersion.version);
 
 }, false);
 
@@ -273,6 +276,10 @@ ch.response.onChat = function (err, d) {
             var mcount = parseInt(span.html()) + 1;
             span.html(mcount).css('display', 'inline-block');
         }
+
+        if(storage("bottle-hide") && d.text.indexOf('class="bottle-line"') > 0)
+            return false;
+
         addMessage(d);
     } else {
         showNotificator('Ошибка отправки сообщения: ' + d, 2000);
@@ -543,23 +550,40 @@ $('.usmenu').live('click', function () {
 $('.umenucont').live('mouseleave', function () {
     $(this).hide();
 });
-$('dda span.label').live('click', function () {
-    if (user.nick != $(this).text()) {
-        var inp = curRoomSel('.messageinput');
-        var text = inp.val() + $(this).text() + ' ';
-        inp.focus().val(text);
-    }
+
+$('.profava').live('click', function(){
+
+    var to = $(this).attr('nn') || $(this).text();
+
+    if(user.nick == to)
+        return false;
+
+    var inp = curRoomSel('.messageinput');
+    var labels = curRoomSel('.nick-labels-list');
+
+    inp.focus();
+
+    var arr = [];
+    labels.children().each(function(){
+        arr.push($(this).attr('data-nick'));
+    });
+
+    if(arr.indexOf(to) > -1)
+        return false;
+
+    var elem = $('<span class="nick-label"></span>');
+    elem.attr('title', 'Удалить').attr('data-nick', to).html(to);
+    labels.append(elem);
+    elem.click(function(){
+        $(this).remove();
+        inp.focus();
+    });
+
 });
+
 $('#smWrap img').live('click', function () {
     curRoomSel('.messageinput').val(curRoomSel('.messageinput').val() + ' *smile' + $(this).attr('num') + '* ');
     hideForm();
-});
-$('.profava').live('click', function () {
-    var nn = $(this).attr('nn');
-    if (user.nick != nn) {
-        hideForm();
-        curRoomSel('.messageinput').val(curRoomSel('.messageinput').val() + nn + ': ').focus();
-    }
 });
 $('.close-form img').live('click', function () {
     hideForm();
@@ -752,17 +776,37 @@ function clickStateitem() {
         ch.setState(curState);
     }
 }
-function clickSendmess() {
+function clickSendmess(){
     var t = curRoomSel('.messageinput').val();
-    if ($.trim(t) == '') return false;
+
+    if($.trim(t) == '')
+        return false;
+
     mhist.old = t;
 
-    if (currentType == 'room') {
+    var labels = curRoomSel('.nick-labels-list');
+    labels.children().each(function(){
+        var label = $(this).attr('data-nick');
+        t = label + ': ' + t;
+    });
+
+    if(currentType == 'room'){
+
+        if(t == '!бутылка игнор') {
+            storage("bottle-hide", true);
+            curRoomSel('.messageinput').val('').css('backgroundColor','white');
+            return showNotificator('Теперь вы не будете получать уведомления от бутылки', 3000);
+        } else if (t == '!бутылка вернись') {
+            storage("bottle-hide", false);
+            curRoomSel('.messageinput').val('').css('backgroundColor','white');
+            return showNotificator('Бутылка вернулась!', 3000);
+        }
+
         ch.chat(t, currentRoom, curColor, correctLatMess);
     } else {
         ch.sendMessage(t, currentRoom, curColor);
     }
-    curRoomSel('.messageinput').val('').focus();
+    curRoomSel('.messageinput').val('').css('backgroundColor','white');
     correctLatMess = false;
 }
 function clickSendImage() {
