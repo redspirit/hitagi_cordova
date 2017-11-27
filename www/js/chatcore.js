@@ -7,8 +7,8 @@ var mhist = {cur: '', old: ''}, correctLatMess = false;
 var blurTimers = {};
 var titleDefault = 'Аниме чат Hitagi';
 var imagesUrl = 'http://chat.aniavatars.com';
-//var ch = hitagiCreate('ws://chat.aniavatars.com', true);
-var ch = hitagiCreate('ws://localhost:8091', true);
+var ch = hitagiCreate('ws://chat.aniavatars.com', true);
+//var ch = hitagiCreate('ws://localhost:8091', true);
 var isDevice = document.URL.indexOf('http://') === -1 && document.URL.indexOf('https://') === -1;
 var debouncer = new JoinDebouncer(5);
 var authLock = new Auth0Lock(
@@ -41,10 +41,11 @@ authLock.on("authenticated", function(authResult) {
 
 (function(){
 
-    if(!isDevice)
-        window.AppVersion = {
-            version: 'web'
-        };
+    if(!isDevice) {
+        window.AppVersion = {version: 'web'};
+    }
+
+
 })();
 
 
@@ -1300,7 +1301,8 @@ function privGrid(a, b) {
 /********** AUTHENTICATION AND REGISTRATION ************/
 
 function showAuthWindow() {
-    showForm(tpl('auth', {version: AppVersion.version}), 'Авторизация', 'reg-alert');
+    var ver = window.AppVersion ? AppVersion.version : '-';
+    showForm(tpl('auth', {version: ver}), 'Авторизация', 'reg-alert');
     $('#auth_but').click(function () {
         var login = $('#auth_login').val();
         var pass = $('#auth_pass').val();
