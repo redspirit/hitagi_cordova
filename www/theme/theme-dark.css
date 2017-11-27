@@ -674,14 +674,11 @@ dd.bot {
 
 .btn {
     background: #3c5e10;
-    color: #fff;
     padding: 6px 20px;
     margin: 3px;
     color: #cdcdcd;
     vertical-align: middle;
     zoom: 1;
-    *
-    display: inline;
     -moz-border-radius: 4px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
